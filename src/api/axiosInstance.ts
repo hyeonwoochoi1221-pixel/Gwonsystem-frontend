@@ -1,9 +1,9 @@
-// src/api/axiosInstance.ts
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080', // 백엔드 서버 주소
-  timeout: 5000,                    // 5초 지나면 요청 취소
+  // 💡 개발 환경과 배포 환경에 따라 주소가 자동으로 바뀌도록 설정
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
+  timeout: 5000,
   headers: {
     'Content-Type': 'application/json',
   },
