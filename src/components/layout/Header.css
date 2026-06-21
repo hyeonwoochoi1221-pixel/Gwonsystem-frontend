@@ -1,0 +1,23 @@
+/* Header.css */
+.main-header {
+  padding: 10px 20px;
+  background-color: #1a1a1a; /* 어두운 테마에 맞춰 배경색 지정 */
+}
+
+.logo-link {
+  display: flex;
+  align-items: center; /* 로고와 텍스트를 세로 중앙 정렬 */
+  gap: 12px;           /* 로고와 텍스트 사이의 간격 */
+  text-decoration: none;
+}
+
+.logo-svg {
+  width: 45px;         /* 로고 크기 조절 (원하는 만큼 수정하세요) */
+  height: auto;
+}
+
+.system-title {
+  font-size: 1.5rem;   /* 글자 크기 */
+  font-weight: bold;
+  color: #ffffff;      /* 글자 색상 */
+}

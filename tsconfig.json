@@ -10,12 +10,13 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "module": "ESNext",
-    "moduleResolution": "node",
+    /* node 대신 bundler 사용을 권장합니다 */
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "types": ["vite/client"]
+    "types": ["vite/client", "vite-plugin-svgr/client"]
   },
   "include": ["src", "vite.config.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]

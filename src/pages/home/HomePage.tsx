@@ -21,7 +21,7 @@ export default function HomePage() {
       <section className="dashboard-card">
         <div className="card-header">
           <Link to="/notice" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <h2>📢 사내 공지사항</h2>
+            <h2>사내 공지사항</h2>
           </Link>
         </div>
         <ul className="list-content">
@@ -37,7 +37,7 @@ export default function HomePage() {
       {/* 2. 오늘의 일정 카드 */}
       <section className="dashboard-card">
         <div className="card-header">
-          <h2>📅 오늘의 일정</h2>
+          <h2>오늘의 일정</h2>
         </div>
         <ul className="list-content">
           {MOCK_SCHEDULES.map((s) => (
@@ -52,7 +52,7 @@ export default function HomePage() {
       {/* 3. 사용자 정보 카드 */}
       <section className="dashboard-card">
         <div className="card-header">
-          <h2>👥 실시간 임직원 목록</h2>
+          <h2>실시간 임직원 목록</h2>
         </div>
 
         {/* 로딩 상태 처리 */}

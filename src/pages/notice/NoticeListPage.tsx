@@ -10,7 +10,7 @@ export default function NoticeListPage() {
   return (
     <main className="notice-container">
       <header className="notice-header">
-        <h1>📢 사내 공지사항</h1>
+        <h1>사내 공지사항</h1>
         <Link to="/" className="back-link">← 대시보드로 돌아가기</Link>
       </header>
 
