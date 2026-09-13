@@ -54,6 +54,8 @@ body.light .login-top-header {
   color: var(--text-sub);
   text-decoration: none;
   font-weight: 500;
+  font-size: 12px;
+  transition: color 0.15s ease;
 }
 
 .login-btn-link:hover {
@@ -63,6 +65,55 @@ body.light .login-top-header {
 .divider {
   color: var(--border-color);
   font-size: 10px;
+}
+
+/* ==========================================================================
+   ✨ 로그인 완료 시 유저 정보 및 환영 문구 영역
+   ========================================================================== */
+.user-greet-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-greet-text {
+  color: var(--text-main);
+  font-size: 12px;
+}
+
+.user-greet-text strong {
+  color: var(--accent-color);
+  font-weight: 700;
+}
+
+/* 등급 뱃지 (관리자, 정회원, 일반회원) */
+.user-role-tag {
+  background-color: rgba(56, 189, 248, 0.15);
+  color: var(--accent-color);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 10px;
+}
+
+/* 상단 탑바 로그아웃 버튼 */
+.btn-header-logout {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-sub);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  line-height: 1.2;
+  transition: all 0.2s ease;
+}
+
+.btn-header-logout:hover {
+  background-color: #ef4444;
+  border-color: #ef4444;
+  color: #ffffff;
 }
 
 /* 2단: 메인 네비게이션 헤더 */
@@ -124,25 +175,128 @@ body.light .login-top-header {
   color: var(--accent-color);
 }
 
-/* 메인 헤더 테마 전환 버튼 */
-.main-theme-toggle-btn {
-  background-color: var(--bg-hover);
-  color: var(--text-main);
-  border: 1px solid var(--border-color);
-  padding: 6px 14px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 600;
+/* ==========================================================================
+   ⚡ 반도체 테크 감성 뉴모피즘 슬라이드 토글 스위치 (.tech-theme-switch)
+   ========================================================================== */
+
+.tech-theme-switch {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  transition: all 0.2s ease;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  padding: 4px 6px;
+  border-radius: 20px;
+  outline: none;
+  transition: all 0.25s ease;
 }
 
-.main-theme-toggle-btn:hover {
-  border-color: var(--accent-color);
-  color: var(--accent-color);
+/* 좌우 LIGHT / DARK 인디케이터 라벨 */
+.switch-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  transition: color 0.25s ease, opacity 0.25s ease;
+}
+
+/* 라이트 모드 상태일 때의 라벨 배색 */
+.tech-theme-switch.is-light .label-light {
+  color: #0284c7; /* 활성화된 시안 블루 */
+  opacity: 1;
+}
+.tech-theme-switch.is-light .label-dark {
+  color: #94a3b8;
+  opacity: 0.5;
+}
+
+/* 다크 모드 상태일 때의 라벨 배색 */
+.tech-theme-switch.is-dark .label-light {
+  color: #64748b;
+  opacity: 0.5;
+}
+.tech-theme-switch.is-dark .label-dark {
+  color: #38bdf8;
+  opacity: 1;
+  text-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+}
+
+/* 음각 트랙(Track): 안으로 깊게 파인 홈 연출 */
+.switch-track {
+  position: relative;
+  width: 54px;
+  height: 28px;
+  border-radius: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
+}
+
+/* [라이트 모드 트랙] 밝은 알루미늄/실버 질감의 음각 음영 */
+.tech-theme-switch.is-light .switch-track {
+  background: #e2e8f0;
+  box-shadow:
+    inset 2px 2px 4px rgba(0, 0, 0, 0.16),
+    inset -2px -2px 4px rgba(255, 255, 255, 0.9);
+  border: 1px solid #cbd5e1;
+}
+
+/* [다크 모드 트랙] 흑연/웨이퍼 챔버 질감의 깊은 음각 음영 */
+.tech-theme-switch.is-dark .switch-track {
+  background: #111116;
+  box-shadow:
+    inset 2px 2px 5px rgba(0, 0, 0, 0.75),
+    inset -1px -1px 3px rgba(255, 255, 255, 0.05);
+  border: 1px solid #23232c;
+}
+
+/* 슬라이더 원형 노브(Thumb): 튀어나온 돔(Dome) 형태 */
+.switch-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* [라이트 모드 노브] 화이트 돔 + 입체 그림자 */
+.tech-theme-switch.is-light .switch-thumb {
+  transform: translateX(0);
+  background: linear-gradient(145deg, #ffffff, #e6e6e6);
+  box-shadow:
+    2px 2px 5px rgba(0, 0, 0, 0.2),
+    -1px -1px 3px rgba(255, 255, 255, 0.8);
+}
+
+/* [다크 모드 노브] 흑연 티타늄 돔 + 26px 우측 이동 */
+.tech-theme-switch.is-dark .switch-thumb {
+  transform: translateX(26px);
+  background: linear-gradient(145deg, #2b2b36, #1f1f27);
+  box-shadow:
+    2px 2px 6px rgba(0, 0, 0, 0.65),
+    -1px -1px 2px rgba(255, 255, 255, 0.08);
+}
+
+/* 노브 중앙 미세 칩셋 LED 인디케이터 */
+.thumb-core-led {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  transition: all 0.25s ease;
+}
+
+/* 라이트 모드일 때 코어: 메탈릭 그레이 */
+.tech-theme-switch.is-light .thumb-core-led {
+  background-color: #94a3b8;
+}
+
+/* 다크 모드일 때 코어: 반도체 전원 인가 시의 네온 스카이블루 LED */
+.tech-theme-switch.is-dark .thumb-core-led {
+  background-color: #38bdf8;
+  box-shadow: 0 0 6px #38bdf8;
 }
 
 /* 스크롤 시 슬림 애니메이션 */
@@ -176,7 +330,7 @@ body.light .header-fixed-container.is-scrolled .main-nav-bar {
   font-size: 1.2rem;
 }
 
-/* 햄버거 메뉴 */
+/* 햄버거 메뉴 버튼 */
 .hamburger-btn {
   display: none;
   flex-direction: column;
@@ -198,14 +352,25 @@ body.light .header-fixed-container.is-scrolled .main-nav-bar {
   transition: all 0.3s ease;
 }
 
-/* src/components/layout/Header.css 모바일 미디어 쿼리 부분 교체 */
-
+/* 모바일 반응형 (768px 이하) */
 @media (max-width: 768px) {
   .header-placeholder {
     height: 95px;
   }
 
-  /* 햄버거 버튼 노출 */
+  .user-greet-text {
+    font-size: 11px;
+  }
+
+  .user-role-tag {
+    display: none;
+  }
+
+  .btn-header-logout {
+    padding: 1px 6px;
+    font-size: 10px;
+  }
+
   .hamburger-btn {
     display: flex;
   }
@@ -220,7 +385,7 @@ body.light .header-fixed-container.is-scrolled .main-nav-bar {
     transform: translateY(-8px) rotate(-45deg);
   }
 
-  /* ✨ 우측 참고 이미지 스타일: 깔끔한 좌측 정렬 드롭다운 메뉴 */
+  /* 모바일 드롭다운 메뉴 */
   .nav-menu {
     display: none;
     position: absolute;
@@ -231,7 +396,7 @@ body.light .header-fixed-container.is-scrolled .main-nav-bar {
     border-bottom: 1px solid var(--border-color);
     flex-direction: column;
     padding: 10px 24px 20px;
-    gap: 0; /* 기존 카드 gap 제거 */
+    gap: 0;
     box-sizing: border-box;
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
   }
@@ -246,11 +411,10 @@ body.light .header-fixed-container.is-scrolled .main-nav-bar {
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* 메뉴 텍스트: 좌측 정렬, 하단 밑줄 구분선 (참고 이미지 방식) */
   .nav-item-box {
     display: block;
     width: 100%;
-    background: transparent; /* 배경 박스 제거 */
+    background: transparent;
     border: none;
     border-bottom: 1px solid var(--border-color);
     padding: 16px 8px;
@@ -258,7 +422,7 @@ body.light .header-fixed-container.is-scrolled .main-nav-bar {
     font-size: 15px;
     font-weight: 500;
     color: var(--text-main);
-    text-align: left; /* 좌측 정렬 */
+    text-align: left;
     text-decoration: none;
     box-sizing: border-box;
     transition: color 0.15s ease, padding-left 0.15s ease;
@@ -271,15 +435,10 @@ body.light .header-fixed-container.is-scrolled .main-nav-bar {
     background: transparent;
   }
 
-  /* 다크모드 전환 버튼: 하단에 심플한 텍스트/버튼 형태로 배치 */
-  .main-theme-toggle-btn {
-    margin-top: 14px;
+  /* 모바일 토글 스위치 위치 조정 */
+  .tech-theme-switch {
+    margin-top: 16px;
     align-self: flex-start;
-    padding: 8px 16px;
-    background-color: var(--bg-hover);
-    border: 1px solid var(--border-color);
-    border-radius: 20px;
-    font-size: 13px;
-    width: auto;
+    padding: 6px 0;
   }
 }

@@ -1,0 +1,399 @@
+/* src/pages/auth/Auth.css */
+
+.auth-page-container {
+  min-height: calc(100vh - 180px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+  background-color: var(--bg-main);
+  box-sizing: border-box;
+}
+
+.auth-card {
+  width: 100%;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 36px 32px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  box-sizing: border-box;
+  animation: authCardFadeIn 0.25s ease-out;
+}
+
+@keyframes authCardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-card {
+  max-width: 440px;
+}
+
+.register-card {
+  max-width: 680px;
+}
+
+/* 상단 로고 & 타이틀 영역 */
+.auth-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.auth-logo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  margin-bottom: 12px;
+}
+
+.auth-logo-svg {
+  width: 32px;
+  height: auto;
+}
+
+.auth-logo-text {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.5px;
+}
+
+.auth-header h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  color: var(--text-main);
+}
+
+.auth-header p {
+  font-size: 13px;
+  color: var(--text-sub);
+  margin: 0;
+}
+
+/* 피드백 알림 배너 (에러 / 성공) */
+.auth-error-alert {
+  background-color: rgba(239, 68, 68, 0.15);
+  border: 1px solid #ef4444;
+  color: #ef4444;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 18px;
+  text-align: left;
+  line-height: 1.4;
+}
+
+.auth-success-alert {
+  background-color: rgba(56, 189, 248, 0.15);
+  border: 1px solid var(--accent-color);
+  color: var(--accent-color);
+  padding: 12px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 18px;
+  text-align: center;
+  animation: authAlertFadeIn 0.3s ease-out;
+}
+
+@keyframes authAlertFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 폼 스타일 */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent-color);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 6px;
+  margin-top: 10px;
+  text-align: left;
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.form-group label .req {
+  color: #ef4444;
+  margin-left: 2px;
+}
+
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.forgot-link {
+  font-size: 12px;
+  color: var(--accent-color);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
+  opacity: 0.85;
+}
+
+.form-group input,
+.auth-select {
+  width: 100%;
+  padding: 11px 13px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-hover);
+  color: var(--text-main);
+  font-size: 13px;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.form-group input:focus,
+.auth-select:focus {
+  border-color: var(--accent-color);
+  background-color: var(--bg-card);
+}
+
+.form-group input:disabled,
+.auth-select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: var(--border-color);
+}
+
+/* 법률 고지 약관 박스 */
+.privacy-clause-box {
+  background-color: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 14px 16px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-sub);
+  text-align: left;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.privacy-clause-box h4 {
+  margin: 0 0 6px 0;
+  font-size: 12px;
+  color: var(--text-main);
+}
+
+.privacy-clause-box p {
+  margin: 4px 0;
+}
+
+/* 체크박스 동의 그룹 */
+.agreement-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+  padding: 8px 0;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-main);
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent-color);
+  cursor: pointer;
+}
+
+.checkbox-label.all-agree {
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--border-color);
+}
+
+/* 제출 버튼 */
+.btn-auth-submit {
+  width: 100%;
+  padding: 13px 0;
+  margin-top: 10px;
+  background-color: var(--accent-color);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s, background-color 0.2s;
+}
+
+.btn-auth-submit:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btn-auth-submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-auth-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  filter: grayscale(20%);
+}
+
+/* 소셜 로그인 구분선 */
+.auth-divider {
+  position: relative;
+  text-align: center;
+  margin: 22px 0 16px;
+}
+
+.auth-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: var(--border-color);
+}
+
+.auth-divider span {
+  position: relative;
+  background-color: var(--bg-card);
+  padding: 0 10px;
+  font-size: 12px;
+  color: var(--text-sub);
+}
+
+/* 소셜 버튼 그룹 */
+.social-auth-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-social {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 11px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+.btn-social:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.btn-google {
+  background-color: #ffffff;
+  color: #3c4043;
+  border: 1px solid #dadce0;
+}
+
+.btn-naver {
+  background-color: #03c75a;
+  color: #ffffff;
+  border: none;
+}
+
+.naver-logo-n {
+  font-size: 14px;
+  font-weight: 900;
+  font-family: sans-serif;
+}
+
+/* 하단 전환 링크 */
+.auth-footer-nav {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-sub);
+  margin-top: 22px;
+}
+
+.auth-footer-nav a {
+  color: var(--accent-color);
+  font-weight: 600;
+  text-decoration: none;
+  margin-left: 4px;
+  transition: text-decoration 0.2s;
+}
+
+.auth-footer-nav a:hover {
+  text-decoration: underline;
+}
+
+/* 모바일 반응형 (768px 이하) */
+@media (max-width: 768px) {
+  .auth-page-container {
+    padding: 20px 12px;
+  }
+
+  .auth-card {
+    padding: 26px 18px;
+    border-radius: 10px;
+  }
+
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .auth-header h2 {
+    font-size: 20px;
+  }
+}

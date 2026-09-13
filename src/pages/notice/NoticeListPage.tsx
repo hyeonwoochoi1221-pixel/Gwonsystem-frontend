@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { getNotices, deleteNotice } from '../../api/noticeService';
 import { Notice } from '../../types';
 import NoticeCreateModal from './NoticeCreateModal';
+import PermissionGate from '../../components/common/PermissionGate';
 import './NoticeListPage.css';
 
 export default function NoticeListPage() {
   const [notices, setNotices] = useState<Notice[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // 더블클릭하여 열어둘 공지사항 ID 저장 상태 (null이면 모두 닫힘)
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
   const fetchNotices = () => {
@@ -24,127 +24,131 @@ export default function NoticeListPage() {
     fetchNotices();
   }, []);
 
-  // 더블클릭 핸들러 (본문 펼침 / 접기 토글)
   const handleRowDoubleClick = (id: number) => {
     setExpandedId((prev) => (prev === id ? null : id));
   };
 
-  // 삭제 핸들러
   const handleDelete = async (e: React.MouseEvent, id: number, title: string) => {
-    e.stopPropagation(); // 더블클릭 또는 행 클릭 이벤트 방지
+    e.stopPropagation();
     if (!window.confirm(`"${title}" 공지사항을 정말 삭제하시겠습니까?`)) {
       return;
     }
 
     try {
       await deleteNotice(id);
-      alert('삭제되었습니다.');
-      // 삭제 후 UI 동기화: 목록에서 제거
+      alert('공지사항이 삭제되었습니다.');
       setNotices((prev) => prev.filter((item) => item.id !== id));
       if (expandedId === id) setExpandedId(null);
     } catch (err) {
-      alert('삭제 처리에 실패했습니다.');
+      alert('삭제 처리에 실패했습니다. (권한을 확인하세요)');
     }
   };
 
   return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '40px 20px', color: '#fff' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <div>
-          <h1 style={{ fontSize: '24px', margin: 0 }}>📢 사내 공지사항 목록</h1>
-          <span style={{ fontSize: '12px', color: '#888' }}>* 글을 더블클릭하면 본문을 열람할 수 있습니다.</span>
+    <div className="notice-page-container">
+      <div className="notice-card-wrapper">
+        {/* 상단 헤더 영역 */}
+        <div className="notice-page-header">
+          <div className="notice-header-title">
+            <h1>📢 사내 공지사항 목록</h1>
+            <p className="notice-subtext">* 항목을 더블클릭하면 본문 내용을 열람할 수 있습니다.</p>
+          </div>
+          <div className="notice-header-actions">
+            {/* 정회원 및 최고관리자에게만 작성 버튼 노출 */}
+            <PermissionGate requiresManager>
+              <button
+                type="button"
+                className="btn-create-notice"
+                onClick={() => setIsModalOpen(true)}
+              >
+                + 공지 작성
+              </button>
+            </PermissionGate>
+            <Link to="/" className="btn-back-home">← 메인 홈</Link>
+          </div>
         </div>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          style={{ padding: '10px 18px', backgroundColor: '#0070f3', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
-        >
-          + 공지 작성
-        </button>
-      </div>
 
-      {loading ? (
-        <div style={{ textAlign: 'center', padding: '40px' }}>로딩 중...</div>
-      ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-          <thead>
-          <tr style={{ borderBottom: '2px solid #4ea8de', padding: '10px 0', color: '#a8a8b3' }}>
-            <th style={{ width: '80px', padding: '12px' }}>분류</th>
-            <th style={{ padding: '12px' }}>제목</th>
-            <th style={{ width: '80px', padding: '12px', textAlign: 'center' }}>조회수</th>
-            <th style={{ width: '110px', padding: '12px', textAlign: 'right' }}>등록일</th>
-            <th style={{ width: '70px', padding: '12px', textAlign: 'center' }}>관리</th>
-          </tr>
-          </thead>
-          <tbody>
-          {notices.map((notice) => {
-            const isExpanded = expandedId === notice.id;
+        {/* 테이블 컨텐츠 영역 */}
+        {loading ? (
+          <div className="notice-loading">공지사항을 불러오는 중입니다...</div>
+        ) : notices.length === 0 ? (
+          <div className="notice-empty">등록된 공지사항이 없습니다.</div>
+        ) : (
+          <div className="notice-table-responsive">
+            <table className="notice-main-table">
+              <thead>
+              <tr>
+                <th className="th-category">분류</th>
+                <th className="th-title">제목</th>
+                <th className="th-views">조회수</th>
+                <th className="th-date">등록일</th>
+                <PermissionGate requiresManager>
+                  <th className="th-manage">관리</th>
+                </PermissionGate>
+              </tr>
+              </thead>
+              <tbody>
+              {notices.map((notice) => {
+                const isExpanded = expandedId === notice.id;
 
-            return (
-              <React.Fragment key={notice.id}>
-                {/* 기본 공지사항 행: 더블클릭 이벤트 설정 */}
-                <tr
-                  onDoubleClick={() => handleRowDoubleClick(notice.id)}
-                  style={{
-                    borderBottom: isExpanded ? 'none' : '1px solid #2c2c35',
-                    cursor: 'pointer',
-                    userSelect: 'none', // 더블클릭 시 텍스트 블록 방지
-                    backgroundColor: isExpanded ? '#24242c' : 'transparent'
-                  }}
-                >
-                  <td style={{ padding: '14px 12px' }}>
-                      <span style={{ color: notice.isPinned ? '#e63946' : '#a8a8b3', fontWeight: notice.isPinned ? 'bold' : 'normal' }}>
-                        {notice.isPinned ? '★ 공지' : notice.category}
-                      </span>
-                  </td>
-                  <td style={{ padding: '14px 12px', fontWeight: notice.isPinned ? 'bold' : 'normal' }}>
-                    {notice.title}
-                  </td>
-                  <td style={{ padding: '14px 12px', textAlign: 'center', color: '#888' }}>
-                    {notice.viewCount}
-                  </td>
-                  <td style={{ padding: '14px 12px', textAlign: 'right', color: '#888' }}>
-                    {notice.date}
-                  </td>
-                  <td style={{ padding: '14px 12px', textAlign: 'center' }}>
-                    <button
-                      onClick={(e) => handleDelete(e, notice.id, notice.title)}
-                      style={{
-                        background: 'transparent',
-                        border: '1px solid #ff4d4f',
-                        color: '#ff4d4f',
-                        padding: '4px 8px',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px'
-                      }}
+                return (
+                  <React.Fragment key={notice.id}>
+                    <tr
+                      onDoubleClick={() => handleRowDoubleClick(notice.id)}
+                      className={`notice-row ${isExpanded ? 'row-expanded' : ''} ${notice.isPinned ? 'row-pinned' : ''}`}
                     >
-                      삭제
-                    </button>
-                  </td>
-                </tr>
+                      <td className="td-category">
+                          <span className={notice.isPinned ? 'badge-pinned' : 'badge-category'}>
+                            {notice.isPinned ? '★ 중요' : notice.category || notice.dept || '일반'}
+                          </span>
+                      </td>
+                      <td className="td-title">
+                        {notice.isPinned && <strong className="pinned-mark">[공지] </strong>}
+                        {notice.title}
+                      </td>
+                      <td className="td-views">{notice.viewCount ?? 0}</td>
+                      <td className="td-date">{notice.date}</td>
 
-                {/* 더블클릭 시 나타나는 상세 본문 영역 */}
-                {isExpanded && (
-                  <tr style={{ borderBottom: '1px solid #2c2c35', backgroundColor: '#1c1c22' }}>
-                    <td colSpan={5} style={{ padding: '20px', whiteSpace: 'pre-wrap', lineHeight: '1.6', color: '#d1d1d6' }}>
-                      <div style={{ fontWeight: 'bold', marginBottom: '8px', color: '#4ea8de' }}>[공지 내용]</div>
-                      {notice.content}
-                    </td>
-                  </tr>
-                )}
-              </React.Fragment>
-            );
-          })}
-          </tbody>
-        </table>
-      )}
+                      {/* 정회원 및 관리자 전용 삭제 버튼 */}
+                      <PermissionGate requiresManager>
+                        <td className="td-manage">
+                          <button
+                            type="button"
+                            onClick={(e) => handleDelete(e, notice.id, notice.title)}
+                            className="btn-delete-item"
+                          >
+                            삭제
+                          </button>
+                        </td>
+                      </PermissionGate>
+                    </tr>
 
-      {/* 등록 모달 유지 */}
-      <NoticeCreateModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSuccess={fetchNotices}
-      />
+                    {/* 더블클릭 시 슬라이드되는 본문 영역 */}
+                    {isExpanded && (
+                      <tr className="notice-detail-row">
+                        <td colSpan={6} className="notice-detail-content">
+                          <div className="detail-header">[공지 본문 내용]</div>
+                          <div className="detail-body">
+                            {notice.content || '등록된 본문 상세 내용이 없습니다.'}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                );
+              })}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* 작성 모달 */}
+        <NoticeCreateModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSuccess={fetchNotices}
+        />
+      </div>
     </div>
   );
 }
