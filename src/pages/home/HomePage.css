@@ -1,470 +1,331 @@
-/* ===================================================
-   최상위 컨테이너 (풀 너비 보장)
-   =================================================== */
-.home-page-container {
+/* src/pages/home/HomePage.css */
+
+.academic-home-container {
   width: 100%;
   max-width: 100%;
-  color: var(--text-main);
+  display: flex;
+  flex-direction: column;
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
 }
 
 /* ===================================================
-   1. Hero Banner (배경 애니메이션 및 풀 와이드 확장)
+   1. 상단 대형 와이드 배너 (PC/데스크톱 기본)
    =================================================== */
-.hero-section {
-  position: relative;
+.portal-hero-banner {
   width: 100%;
-  min-height: 75vh; /* 60vh -> 75vh로 확장해 시원한 화면비 확보 */
+  min-height: 520px;
+  padding: 80px 24px;
+  background:
+    linear-gradient(90deg, rgba(10, 40, 110, 0.9) 0%, rgba(0, 112, 243, 0.65) 50%, rgba(13, 148, 136, 0.8) 100%),
+    url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1920&auto=format&fit=crop') center/cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-}
-
-.hero-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background:
-    linear-gradient(rgba(18, 18, 20, 0.75), rgba(18, 18, 20, 0.9)),
-    url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1920&auto=format&fit=crop') center/cover no-repeat;
-  animation: heroZoom 20s infinite alternate ease-in-out;
-  z-index: 1;
-}
-
-@keyframes heroZoom {
-  0% { transform: scale(1); }
-  100% { transform: scale(1.12); }
-}
-
-.hero-content {
-  position: relative;
-  z-index: 2;
   text-align: center;
-  width: 100%;
-  max-width: 1400px; /* 기존 800px -> 1400px 확장 */
-  padding: 0 40px;
+  color: #ffffff;
   box-sizing: border-box;
 }
 
-.hero-badge {
-  display: inline-block;
-  font-size: 13px;
-  letter-spacing: 2px;
-  padding: 6px 16px;
-  background: rgba(78, 168, 222, 0.15);
-  color: var(--accent-color);
-  border: 1px solid var(--accent-color);
-  border-radius: 20px;
-  margin-bottom: 20px;
-}
-
-.hero-title {
-  font-size: 3.6rem; /* 폰트 크기 확장 */
-  line-height: 1.25;
-  margin-bottom: 20px;
-  font-weight: 800;
-}
-
-.hero-highlight {
-  color: var(--accent-color);
-}
-
-.hero-description {
-  font-size: 1.25rem;
-  color: var(--text-sub);
-  margin-bottom: 36px;
-}
-
-.hero-actions {
+.hero-banner-content {
+  max-width: 1400px;
+  width: 100%;
   display: flex;
-  justify-content: center;
-  gap: 20px;
+  flex-direction: column;
+  align-items: center;
 }
 
-.btn-hero-primary {
-  padding: 14px 30px;
-  background-color: var(--accent-color);
-  color: #fff;
-  border-radius: 6px;
-  text-decoration: none;
+.hero-logo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(6px);
+  padding: 8px 20px;
+  border-radius: 30px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.hero-logo-svg {
+  width: 32px;
+  height: auto;
+  display: block;
+}
+
+.hero-logo-text {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #ffffff;
+}
+
+.hero-subtext {
+  font-size: 16px;
+  letter-spacing: 1.2px;
+  color: #7dd3fc;
+  margin: 0 0 10px 0;
   font-weight: 600;
+}
+
+.hero-main-title {
+  font-size: 3.8rem;
+  font-weight: 900;
+  letter-spacing: -1px;
+  margin: 0 0 12px 0;
+  text-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.hero-conference-desc {
+  font-size: 1.35rem;
+  font-weight: 400;
+  margin: 0 0 26px 0;
+  color: #e0f2fe;
+}
+
+.hero-meta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
+  padding: 12px 28px;
+  border-radius: 30px;
   font-size: 15px;
-  transition: opacity 0.2s;
+  font-weight: 500;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.btn-hero-primary:hover {
-  opacity: 0.9;
-}
-
-.btn-hero-secondary {
-  padding: 14px 30px;
-  background-color: transparent;
-  color: #fff;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  text-decoration: none;
-  font-size: 15px;
-  transition: background 0.2s;
-}
-
-.btn-hero-secondary:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+.hero-meta-badge .divider {
+  color: rgba(255, 255, 255, 0.4);
 }
 
 /* ===================================================
-   섹션 공통 래퍼 (와이드 화면 대응 풀-스트레치)
+   2. 메인 2x2 카드 그리드 (PC/데스크톱 기본)
    =================================================== */
-/* 공지사항 섹션 배경 및 내부 컨테이너 정렬 */
-.section-wrapper.bg-alt {
-  background-color: #16161a;
+.portal-grid-section {
+  max-width: 1400px;
   width: 100%;
-  max-width: 100%; /* 배경은 화면 전체를 채움 */
-  padding: 80px 0; /* 상하 여백만 지정 */
+  margin: 50px auto 30px;
+  padding: 0 24px;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+}
+
+.portal-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 24px 28px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
   box-sizing: border-box;
 }
 
-/* bg-alt 내부의 실제 콘텐츠 영역을 중앙 정렬하고 좌우 여백 부여 */
-.section-wrapper.bg-alt > * {
-  max-width: 1600px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 40px;
-  padding-right: 40px;
+.card-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.card-top-bar h3 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.btn-more {
+  background-color: var(--accent-color);
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+
+/* 공지사항 목록 - 기본 왼쪽 정렬 강제 */
+.portal-notice-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  text-align: left;
+}
+
+.portal-notice-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px dashed var(--border-color);
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+.portal-notice-item:last-child {
+  border-bottom: none;
+}
+
+.notice-title {
+  flex: 1;
+  min-width: 0;
+  text-align: left !important;
+  color: var(--text-main);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 16px;
+  display: block;
+}
+
+.pinned-star {
+  color: #ef4444;
+  margin-right: 6px;
+  font-weight: bold;
+}
+
+.notice-date {
+  color: var(--text-sub);
+  font-size: 12px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+/* 주요 행사 및 일정 */
+.event-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.event-item-box {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  padding: 16px;
+  border-radius: 6px;
+}
+
+.event-badge {
+  display: inline-block;
+  background: var(--badge-bg);
+  color: var(--accent-color);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-bottom: 8px;
+}
+
+.event-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 6px 0;
+  color: var(--text-main);
+}
+
+.event-date {
+  font-size: 11px;
+  color: var(--text-sub);
+}
+
+/* 포토 갤러리 */
+.gallery-thumbnail-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.gallery-thumb img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+}
+
+.gallery-thumb p {
+  font-size: 13px;
+  margin: 8px 0 0 0;
+  color: var(--text-main);
+  text-align: center;
+}
+
+/* ===================================================
+   3. About Us & Location 섹션 (PC 기본)
+   =================================================== */
+.section-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 50px 24px 80px;
+  width: 100%;
   box-sizing: border-box;
 }
 
 .section-header h2 {
-  font-size: 32px;
-  margin-bottom: 10px;
+  font-size: 28px;
+  margin-bottom: 8px;
+  color: var(--text-main);
 }
 
 .section-header p {
   color: var(--text-sub);
-  font-size: 15px;
-}
-
-/* ===================================================
-   2. Strengths Grid (데스크톱 4열 확장)
-   =================================================== */
-.strengths-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4열 전체 너비 균등 분할 */
-  gap: 28px;
-  margin-top: 40px;
-}
-
-.strength-card {
-  background: var(--bg-card);
-  padding: 36px 28px;
-  border-radius: 10px;
-  border: 1px solid var(--border-color);
-  text-decoration: none;
-  color: inherit;
-  transition: transform 0.2s, border-color 0.2s;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.strength-card:hover {
-  transform: translateY(-6px);
-  border-color: var(--accent-color);
-}
-
-.strength-icon {
-  font-size: 40px;
-  margin-bottom: 20px;
-}
-
-.strength-card h3 {
-  margin: 0 0 12px 0;
-  font-size: 20px;
-}
-
-.strength-card p {
-  color: var(--text-sub);
   font-size: 14px;
-  line-height: 1.6;
-  margin-bottom: 20px;
+  margin-top: 0;
 }
 
-.strength-link-text {
-  font-size: 13px;
-  color: var(--accent-color);
-  font-weight: 600;
-}
-
-/* ===================================================
-   3. Notice Box
-   =================================================== */
-.more-link {
-  color: var(--text-sub);
-  text-decoration: none;
-  font-size: 14px;
-}
-
-.more-link:hover {
-  color: var(--accent-color);
-}
-
-.home-notice-box {
-  background: var(--bg-card);
-  border-radius: 10px;
-  border: 1px solid var(--border-color);
-  margin-top: 28px;
-  overflow: hidden;
-}
-
-.home-notice-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.home-notice-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 28px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.home-notice-item:last-child {
-  border-bottom: none;
-}
-
-.notice-meta {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.notice-dept-tag {
-  font-size: 12px;
-  padding: 4px 10px;
-  background: #272730;
-  color: var(--accent-color);
-  border-radius: 4px;
-}
-
-.notice-dept-tag.pinned {
-  background: rgba(230, 57, 70, 0.15);
-  color: #ff5c5c;
-  font-weight: bold;
-}
-
-.notice-title-text {
-  font-size: 15px;
-}
-
-.notice-date-text {
-  font-size: 13px;
-  color: var(--text-sub);
-}
-
-/* ===================================================
-   4. About & Map (풀 와이드 레이아웃)
-   =================================================== */
 .about-grid {
   display: grid;
   grid-template-columns: 1fr 1.25fr;
-  gap: 40px;
-  margin-top: 36px;
+  gap: 36px;
+  margin-top: 24px;
 }
 
 .about-info-card {
   background: var(--bg-card);
-  padding: 40px;
-  border-radius: 10px;
+  padding: 36px;
+  border-radius: 8px;
   border: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  box-sizing: border-box;
 }
 
 .about-info-card h3 {
   margin-top: 0;
-  font-size: 22px;
+  font-size: 20px;
   color: var(--text-main);
 }
 
 .about-info-card p {
   color: var(--text-sub);
-  line-height: 1.7;
-  font-size: 15px;
+  line-height: 1.6;
+  font-size: 14px;
 }
 
 .company-details p {
-  margin: 8px 0;
+  margin: 6px 0;
   font-size: 14px;
-  color: #d1d1d6;
+  color: var(--text-main);
 }
 
-.map-container {
-  min-height: 440px; /* 지도 크기를 넉넉하게 키움 */
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid var(--border-color);
-}
-
-/* ===================================================
-   반응형 브레이크포인트 (Tablet & Mobile)
-   =================================================== */
-
-/* 1. 태블릿 및 작은 데스크톱 (1024px 이하) */
-@media (max-width: 1024px) {
-  .hero-section {
-    min-height: 460px;
-  }
-
-  .hero-title {
-    font-size: 2.4rem;
-  }
-
-  .section-wrapper {
-    padding: 60px 24px;
-  }
-
-  .strengths-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-
-  .about-grid {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-
-  .map-container {
-    height: 340px;
-  }
-}
-
-/* 2. 일반 모바일 기기 (768px 이하) */
-@media (max-width: 768px) {
-  .hero-section {
-    min-height: auto;
-    padding: 70px 0;
-  }
-
-  .hero-title {
-    font-size: 1.85rem;
-    line-height: 1.35;
-  }
-
-  .hero-description {
-    font-size: 0.95rem;
-    margin-bottom: 24px;
-  }
-
-  .hero-actions {
-    flex-direction: column;
-    gap: 12px;
-    width: 100%;
-    max-width: 280px;
-    margin: 0 auto;
-  }
-
-  .btn-hero-primary,
-  .btn-hero-secondary {
-    width: 100%;
-    text-align: center;
-    box-sizing: border-box;
-    padding: 12px 16px;
-  }
-
-  .section-wrapper {
-    padding: 40px 16px;
-  }
-
-  .section-header h2 {
-    font-size: 22px;
-  }
-
-  .section-header p {
-    font-size: 13px;
-  }
-
-  .strengths-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .strength-card {
-    padding: 24px 20px;
-  }
-
-  .home-notice-item {
-    padding: 14px 16px;
-    gap: 10px;
-  }
-
-  .notice-meta {
-    gap: 8px;
-    flex: 1;
-    min-width: 0;
-  }
-
-  .notice-title-text {
-    font-size: 13px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .notice-date-text {
-    font-size: 11px;
-    flex-shrink: 0;
-  }
-
-  .about-info-card {
-    padding: 24px 20px;
-  }
-
-  .map-container {
-    height: 260px;
-  }
-}
-
-/* 3. 초소형 스마트폰 (480px 이하) */
-@media (max-width: 480px) {
-  .hero-title {
-    font-size: 1.55rem;
-  }
-
-  .hero-badge {
-    font-size: 11px;
-  }
-
-  .home-notice-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-  }
-
-  .notice-meta {
-    width: 100%;
-  }
-
-  .notice-date-text {
-    align-self: flex-end;
-  }
-}
-
-/* About 회사 정보 가로 행 정렬 */
 .company-details .detail-row {
   display: flex;
   align-items: center;
   gap: 8px;
   margin: 8px 0;
   font-size: 14px;
-  color: #d1d1d6;
-  flex-wrap: wrap; /* 모바일 등 좁은 화면에서는 자연스럽게 줄바꿈 */
+  flex-wrap: wrap;
 }
 
 .email-group {
@@ -485,4 +346,144 @@
 .email-group .divider {
   color: var(--text-sub);
   font-size: 12px;
+}
+
+.map-container {
+  min-height: 380px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  box-sizing: border-box;
+}
+
+/* ===================================================
+   반응형 브레이크포인트 (모바일/태블릿 최적화)
+   =================================================== */
+@media (max-width: 768px) {
+  /* 1. 상단 배너 모바일 스케일 조정 */
+  .portal-hero-banner {
+    min-height: auto;
+    padding: 40px 16px 36px;
+    width: 100%;
+  }
+
+  .hero-logo-badge {
+    padding: 6px 14px;
+    margin-bottom: 12px;
+    gap: 8px;
+  }
+
+  .hero-logo-svg {
+    width: 24px;
+  }
+
+  .hero-logo-text {
+    font-size: 13px;
+  }
+
+  .hero-subtext {
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    line-height: 1.4;
+    margin-bottom: 6px;
+    padding: 0 8px;
+    word-break: keep-all;
+  }
+
+  .hero-main-title {
+    font-size: 1.85rem;
+    line-height: 1.25;
+    margin: 4px 0 8px 0;
+  }
+
+  .hero-conference-desc {
+    font-size: 1rem;
+    line-height: 1.35;
+    margin-bottom: 18px;
+    padding: 0 8px;
+    word-break: keep-all;
+  }
+
+  /* 캡슐 뱃지: 세로 2열 배치로 텍스트 겹침 방지 */
+  .hero-meta-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    width: auto;
+    max-width: 90%;
+    border-radius: 16px;
+    font-size: 12px;
+    line-height: 1.3;
+  }
+
+  .hero-meta-badge span {
+    white-space: nowrap;
+  }
+
+  .hero-meta-badge .divider {
+    display: none;
+  }
+
+  /* 2. 중앙 2x2 카드 -> 1열 단일 배치 및 정중앙 정렬 */
+  .portal-grid-section {
+    grid-template-columns: 100%;
+    width: 100%;
+    max-width: 100%;
+    margin: 20px 0;
+    padding: 0 16px;
+  }
+
+  .portal-card {
+    width: 100%;
+    padding: 18px 16px;
+    margin: 0 0 16px 0;
+  }
+
+  .card-top-bar h3 {
+    font-size: 17px;
+  }
+
+  .portal-notice-item {
+    padding: 10px 0;
+    text-align: left;
+  }
+
+  .notice-title {
+    font-size: 13px;
+    text-align: left !important;
+    padding-right: 8px;
+  }
+
+  .notice-date {
+    font-size: 11px;
+  }
+
+  /* 행사, 갤러리, About 카드 1열 전환 */
+  .event-grid,
+  .gallery-thumbnail-row,
+  .about-grid {
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .gallery-thumb img {
+    height: 150px;
+  }
+
+  .section-wrapper {
+    padding: 30px 16px 50px;
+    width: 100%;
+  }
+
+  .about-info-card {
+    padding: 20px 16px;
+    width: 100%;
+  }
+
+  .map-container {
+    min-height: 260px;
+    height: 260px;
+  }
 }

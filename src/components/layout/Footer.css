@@ -1,0 +1,47 @@
+/* src/components/layout/Footer.css */
+.main-footer {
+  background-color: var(--bg-card);
+  border-top: 1px solid var(--border-color);
+  padding: 48px 24px;
+  color: var(--text-sub);
+  font-size: 13px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 수직 1열 중앙 정렬 배치 */
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 20px;
+}
+
+.footer-info p {
+  margin: 6px 0;
+  line-height: 1.6;
+}
+
+.copyright {
+  color: #666;
+  font-size: 12px;
+  margin-top: 10px !important;
+}
+
+/* KB 에스크로 마크 이미지 크기 확대 */
+.escrow-badge-img {
+  display: block;
+  height: 72px; /* 기존 48px -> 72px로 키움 */
+  width: auto;
+  border: 0;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.escrow-badge-img:hover {
+  transform: scale(1.04);
+}

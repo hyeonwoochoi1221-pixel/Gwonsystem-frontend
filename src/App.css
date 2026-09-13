@@ -1,34 +1,48 @@
-:root {
+/* src/App.css */
+
+/* 기본 다크 테마 */
+:root, body.dark {
   --bg-main: #121214;
-  --bg-card: #1a1a1e;
-  --border-color: #2c2c35;
-  --text-main: #e1e1e6;
-  --text-sub: #a8a8b3;
-  --accent-color: #4ea8de;
+  --bg-card: #1c1c24;
+  --bg-hover: #262630;
+  --border-color: #2e2e38;
+  --text-main: #ffffff;
+  --text-sub: #9e9ea7;
+  --accent-color: #0070f3;
+  --badge-bg: rgba(0, 112, 243, 0.15);
 }
 
-body {
+/* ✨ 라이트 테마: 배경 완전 흰색(#ffffff)으로 적용 */
+body.light {
+  --bg-main: #ffffff;      /* 배경 완전 흰색 */
+  --bg-card: #ffffff;      /* 카드 배경 흰색 */
+  --bg-hover: #f5f7fa;     /* 호버 시 연한 그레이 */
+  --border-color: #e2e8f0;  /* 얇고 단정한 경계선 */
+  --text-main: #111827;     /* 선명한 블랙 폰트 */
+  --text-sub: #6b7280;     /* 보조 텍스트 그레이 */
+  --accent-color: #0070f3;
+  --badge-bg: #eff6ff;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
   background-color: var(--bg-main);
   color: var(--text-main);
-  font-family: 'Malgun Gothic', sans-serif;
-  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow-x: hidden;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-.app-container {
+#root, .app-container {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  width: 100%; /* 너비가 100%로 설정되어 있어야 합니다 */
+  width: 100%;
   max-width: 100%;
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
-
-/* 공통 헤더/푸터 스타일 */
-.main-header {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 15px 40px; background-color: var(--bg-card); border-bottom: 1px solid var(--border-color);
-}
-.badge { font-size: 11px; background: #34343a; padding: 3px 6px; border-radius: 4px; margin-left: 10px; color: var(--text-sub); }
-
-.main-footer { text-align: center; padding: 20px; font-size: 12px; color: var(--text-sub); border-top: 1px solid var(--border-color); background-color: var(--bg-card); }
