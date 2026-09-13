@@ -1,49 +1,166 @@
+/* src/pages/notice/NoticeListPage.css */
+
 .notice-container {
-  padding: 40px;
+  padding: 40px 20px;
   max-width: 1000px;
   margin: 0 auto;
   width: 100%;
   box-sizing: border-box;
+  color: var(--text-main);
 }
 
+/* 상단 헤더 영역 (타이틀 + 안내문구 + 등록 버튼) */
 .notice-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
+  align-items: flex-end;
+  margin-bottom: 24px;
 }
 
+.notice-header-left h1 {
+  font-size: 24px;
+  margin: 0 0 6px 0;
+  color: var(--text-main);
+}
+
+.notice-sub-guide {
+  font-size: 13px;
+  color: var(--text-sub);
+}
+
+/* 공지 작성 버튼 */
+.btn-create-notice {
+  padding: 10px 18px;
+  background-color: #0070f3;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-create-notice:hover {
+  background-color: #005bb5;
+}
+
+/* 뒤로 가기 링크 */
 .back-link {
   color: var(--text-sub);
   text-decoration: none;
   font-size: 14px;
 }
 
+.back-link:hover {
+  color: var(--accent-color);
+}
+
+/* 게시판 테이블 */
 .notice-table {
   width: 100%;
   border-collapse: collapse;
   background: var(--bg-card);
   border-radius: 8px;
   overflow: hidden;
+  border: 1px solid var(--border-color);
 }
 
-.notice-table th, .notice-table td {
-  padding: 16px;
+.notice-table th,
+.notice-table td {
+  padding: 14px 16px;
   text-align: left;
-  border-bottom: 1px solid var(--border-color);
 }
 
 .notice-table th {
-  background: #25252b;
+  background: #202026;
   color: var(--text-sub);
+  font-size: 14px;
+  font-weight: 600;
+  border-bottom: 2px solid var(--border-color);
 }
 
+/* 데이터 행 (더블클릭 가능한 목록 행) */
+.notice-row {
+  cursor: pointer;
+  user-select: none; /* 더블클릭 시 파란색 텍스트 선택 영역 방지 */
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.15s ease;
+}
+
+.notice-row:hover {
+  background-color: #24242c;
+}
+
+.notice-row.expanded {
+  background-color: #262630;
+  border-bottom: none; /* 본문 영역과 자연스럽게 이어지도록 밑줄 제거 */
+}
+
+/* 부서 및 고정 공지 뱃지 */
 .dept-badge {
   background: #2a2a32;
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 12px;
   color: var(--accent-color);
+  display: inline-block;
 }
 
-.title-cell { font-weight: bold; }
+.dept-badge.pinned {
+  background: rgba(230, 57, 70, 0.15);
+  color: #ff5c5c;
+  font-weight: bold;
+}
+
+.title-cell {
+  font-size: 14px;
+  color: var(--text-main);
+}
+
+.title-cell.pinned {
+  font-weight: bold;
+}
+
+.meta-cell {
+  color: var(--text-sub);
+  font-size: 13px;
+}
+
+/* 삭제 버튼 */
+.btn-delete-notice {
+  background: transparent;
+  border: 1px solid #ff4d4f;
+  color: #ff4d4f;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.btn-delete-notice:hover {
+  background-color: #ff4d4f;
+  color: #ffffff;
+}
+
+/* 더블클릭 시 펼쳐지는 상세 본문 영역 */
+.notice-detail-row {
+  background-color: #17171c;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.notice-detail-content {
+  padding: 24px 28px;
+  line-height: 1.7;
+  color: #d1d1d6;
+  font-size: 14px;
+  white-space: pre-wrap; /* 줄바꿈 유지 */
+}
+
+.notice-detail-title {
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: var(--accent-color);
+  font-size: 13px;
+}
