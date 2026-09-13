@@ -1,24 +1,42 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 239.51 239.51">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000">
   <defs>
-    <linearGradient id="grad1" x1="0" y1="119.76" x2="131.24" y2="119.76" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#c93b2c"/>
-      <stop offset="1" stop-color="#7f2110"/>
+    <linearGradient id="logo-grad-1" x1="37.62" y1="500" x2="514.04" y2="500" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#c83b2b"/>
+      <stop offset=".25" stop-color="#c43929"/>
+      <stop offset=".48" stop-color="#b93525"/>
+      <stop offset=".69" stop-color="#a72e1d"/>
+      <stop offset=".9" stop-color="#8d2413"/>
+      <stop offset="1" stop-color="#7f1f0e"/>
     </linearGradient>
-    <linearGradient id="grad2" x1="265.07" y1="32.93" x2="116.88" y2="32.93" gradientUnits="userSpaceOnUse">
-      <stop offset=".11" stop-color="#f5ac39"/>
-      <stop offset="1" stop-color="#7d5610"/>
+    <linearGradient id="logo-grad-2" x1="1061.05" y1="164.75" x2="488.91" y2="164.75" gradientUnits="userSpaceOnUse">
+      <stop offset=".11" stop-color="#f4ab39"/>
+      <stop offset="1" stop-color="#7c550d"/>
     </linearGradient>
-    <linearGradient id="grad3" x1="265.07" y1="206.58" x2="116.88" y2="206.58" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#f5ac39"/>
-      <stop offset="1" stop-color="#7d5610"/>
+    <linearGradient id="logo-grad-3" x1="1061.05" y1="835.25" x2="488.91" y2="835.25" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f4ab39"/>
+      <stop offset=".34" stop-color="#f1a938"/>
+      <stop offset=".51" stop-color="#eaa335"/>
+      <stop offset=".64" stop-color="#dd9a30"/>
+      <stop offset=".75" stop-color="#ca8d29"/>
+      <stop offset=".85" stop-color="#b27b20"/>
+      <stop offset=".94" stop-color="#956716"/>
+      <stop offset="1" stop-color="#7c550d"/>
     </linearGradient>
-    <linearGradient id="grad4" x1="206.59" y1="52.53" x2="206.59" y2="202.34" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#f5ac39"/>
-      <stop offset="1" stop-color="#7d5610"/>
+    <linearGradient id="logo-grad-4" x1="835.25" y1="240.42" x2="835.25" y2="818.87" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f4ab39"/>
+      <stop offset=".23" stop-color="#f0a837"/>
+      <stop offset=".41" stop-color="#e7a134"/>
+      <stop offset=".57" stop-color="#d6962e"/>
+      <stop offset=".72" stop-color="#bf8525"/>
+      <stop offset=".86" stop-color="#a2701b"/>
+      <stop offset=".99" stop-color="#7e560d"/>
+      <stop offset="1" stop-color="#7c550d"/>
     </linearGradient>
   </defs>
-  <path fill="url(#grad1)" d="M72.41,173.66c-3.62,0-6.55-2.93-6.55-6.55v-94.7c0-3.62,2.93-6.55,6.55-6.55h58.83V0H6.55C2.93,0,0,2.93,0,6.55v226.41c0,3.62,2.93,6.55,6.55,6.55h124.69v-65.86h-58.83Z"/>
-  <path fill="url(#grad2)" d="M173.66,65.86c42.61,0,58.76-39.76,63.85-57.49,1.2-4.19-1.93-8.37-6.3-8.37h-99.97v65.86h42.42Z"/>
-  <path fill="url(#grad3)" d="M194.46,173.66h-20.8s-42.42,0-42.42,0v65.86h101.72c3.62,0,6.55-2.93,6.55-6.55v-59.3h-45.05Z"/>
-  <path fill="url(#grad4)" d="M194.46,173.66v-65.65h-20.8s0-21.25,0-21.25c0,0,42.6,1.84,41.88-24.68l23.98-.18v111.76"/>
+  <path d="M300.47,708.11c-13.14,0-23.78-11.33-23.78-25.3v-365.63c0-13.97,10.65-25.3,23.78-25.3h213.57V37.62H61.4c-13.14,0-23.78,11.33-23.78,25.3v874.18c0,13.97,10.65,25.3,23.78,25.3h452.64v-254.27h-213.57Z" style="fill: url(#logo-grad-1);"/>
+  <g>
+    <path d="M708.11,291.89c164.53,0,226.89-153.5,246.52-221.97,4.64-16.19-7.47-32.3-24.31-32.3h-385.99v254.27h163.78Z" style="fill: url(#logo-grad-2);"/>
+    <path d="M788.44,708.11h-80.32s-163.78,0-163.78,0v254.27h392.75c13.97,0,25.3-11.33,25.3-25.3v-228.98h-173.95Z" style="fill: url(#logo-grad-3);"/>
+  </g>
+  <path d="M788.44,708.11v-253.49h-80.32s0-82.06,0-82.06c0,0,164.47,7.09,161.69-95.28l92.58-.7v431.52" style="fill: url(#logo-grad-4);"/>
 </svg>
