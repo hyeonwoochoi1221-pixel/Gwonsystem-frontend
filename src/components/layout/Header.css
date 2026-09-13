@@ -68,22 +68,75 @@ body.light .login-top-header {
 }
 
 /* ==========================================================================
-   ✨ 로그인 완료 시 유저 정보 및 환영 문구 영역
+   ✨ 로그인 완료 시 유저 정보 및 2열 메타 영역 (이름/정보수정 & 시간/연장)
    ========================================================================== */
 .user-greet-box {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
-.user-greet-text {
-  color: var(--text-main);
-  font-size: 12px;
+/* 2열 텍스트 그룹 컨테이너 */
+.user-auth-meta-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  line-height: 1.25;
 }
 
-.user-greet-text strong {
-  color: var(--accent-color);
+/* 각 열 (위: 파란 텍스트, 아래: 밑줄 액션 링크) */
+.meta-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+}
+
+/* 1열 상단: 사용자 이름 */
+.user-name-text {
+  color: var(--accent-color, #0284c7);
   font-weight: 700;
+  font-size: 11px;
+}
+
+/* 2열 상단: 실시간 카운트다운 시간 (예: 59분 15초) */
+.session-time-text {
+  color: var(--accent-color, #0284c7);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: -0.2px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 5분 이하 남았을 때 붉은색 경고 점멸 */
+.session-time-text.warning {
+  color: #ef4444;
+  animation: sessionWarningBlink 1.2s infinite;
+}
+
+@keyframes sessionWarningBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* 하단 텍스트 링크 (정보수정 / 로그인 연장) */
+.meta-link-action {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-main);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-family: inherit;
+  transition: opacity 0.15s ease;
+}
+
+.meta-link-action:hover {
+  opacity: 0.75;
 }
 
 /* 등급 뱃지 (관리자, 정회원, 일반회원) */
@@ -176,127 +229,69 @@ body.light .login-top-header {
 }
 
 /* ==========================================================================
-   ⚡ 반도체 테크 감성 뉴모피즘 슬라이드 토글 스위치 (.tech-theme-switch)
+   ✨ 미니멀 & 모던 라이트/다크모드 슬라이드 토글 스위치
    ========================================================================== */
 
-.tech-theme-switch {
+.minimal-theme-toggle {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  user-select: none;
-  padding: 4px 6px;
-  border-radius: 20px;
   outline: none;
-  transition: all 0.25s ease;
+  border-radius: 20px;
 }
 
-/* 좌우 LIGHT / DARK 인디케이터 라벨 */
-.switch-label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.8px;
-  transition: color 0.25s ease, opacity 0.25s ease;
+.minimal-theme-toggle:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
 }
 
-/* 라이트 모드 상태일 때의 라벨 배색 */
-.tech-theme-switch.is-light .label-light {
-  color: #0284c7; /* 활성화된 시안 블루 */
-  opacity: 1;
-}
-.tech-theme-switch.is-light .label-dark {
-  color: #94a3b8;
-  opacity: 0.5;
-}
-
-/* 다크 모드 상태일 때의 라벨 배색 */
-.tech-theme-switch.is-dark .label-light {
-  color: #64748b;
-  opacity: 0.5;
-}
-.tech-theme-switch.is-dark .label-dark {
-  color: #38bdf8;
-  opacity: 1;
-  text-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
-}
-
-/* 음각 트랙(Track): 안으로 깊게 파인 홈 연출 */
-.switch-track {
+/* 토글 배경 트랙 (Track) */
+.toggle-track {
   position: relative;
-  width: 54px;
-  height: 28px;
-  border-radius: 14px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-sizing: border-box;
-}
-
-/* [라이트 모드 트랙] 밝은 알루미늄/실버 질감의 음각 음영 */
-.tech-theme-switch.is-light .switch-track {
-  background: #e2e8f0;
-  box-shadow:
-    inset 2px 2px 4px rgba(0, 0, 0, 0.16),
-    inset -2px -2px 4px rgba(255, 255, 255, 0.9);
+  width: 46px;
+  height: 24px;
+  border-radius: 12px;
+  background-color: #e2e8f0;
   border: 1px solid #cbd5e1;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
-/* [다크 모드 트랙] 흑연/웨이퍼 챔버 질감의 깊은 음각 음영 */
-.tech-theme-switch.is-dark .switch-track {
-  background: #111116;
-  box-shadow:
-    inset 2px 2px 5px rgba(0, 0, 0, 0.75),
-    inset -1px -1px 3px rgba(255, 255, 255, 0.05);
-  border: 1px solid #23232c;
+/* 다크 모드일 때 트랙 색상 */
+.minimal-theme-toggle.dark .toggle-track {
+  background-color: #272730;
+  border-color: #3e3e4a;
 }
 
-/* 슬라이더 원형 노브(Thumb): 튀어나온 돔(Dome) 형태 */
-.switch-thumb {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
+/* 슬라이딩 원형 노브 (Thumb) */
+.toggle-thumb {
   position: absolute;
-  top: 2px;
-  left: 3px;
+  top: 1px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease, box-shadow 0.3s ease;
+  font-size: 11px;
+  line-height: 1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.25s ease;
+  user-select: none;
 }
 
-/* [라이트 모드 노브] 화이트 돔 + 입체 그림자 */
-.tech-theme-switch.is-light .switch-thumb {
-  transform: translateX(0);
-  background: linear-gradient(145deg, #ffffff, #e6e6e6);
-  box-shadow:
-    2px 2px 5px rgba(0, 0, 0, 0.2),
-    -1px -1px 3px rgba(255, 255, 255, 0.8);
-}
-
-/* [다크 모드 노브] 흑연 티타늄 돔 + 26px 우측 이동 */
-.tech-theme-switch.is-dark .switch-thumb {
-  transform: translateX(26px);
-  background: linear-gradient(145deg, #2b2b36, #1f1f27);
-  box-shadow:
-    2px 2px 6px rgba(0, 0, 0, 0.65),
-    -1px -1px 2px rgba(255, 255, 255, 0.08);
-}
-
-/* 노브 중앙 미세 칩셋 LED 인디케이터 */
-.thumb-core-led {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  transition: all 0.25s ease;
-}
-
-/* 라이트 모드일 때 코어: 메탈릭 그레이 */
-.tech-theme-switch.is-light .thumb-core-led {
-  background-color: #94a3b8;
-}
-
-/* 다크 모드일 때 코어: 반도체 전원 인가 시의 네온 스카이블루 LED */
-.tech-theme-switch.is-dark .thumb-core-led {
-  background-color: #38bdf8;
-  box-shadow: 0 0 6px #38bdf8;
+/* 다크 모드일 때 우측 슬라이드 및 다크 노브 */
+.minimal-theme-toggle.dark .toggle-thumb {
+  transform: translateX(20px);
+  background-color: #1a1a22;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
 /* 스크롤 시 슬림 애니메이션 */
@@ -358,8 +353,15 @@ body.light .header-fixed-container.is-scrolled .main-nav-bar {
     height: 95px;
   }
 
-  .user-greet-text {
-    font-size: 11px;
+  /* 모바일 탑바 간격 최적화 */
+  .user-auth-meta-group {
+    gap: 8px;
+  }
+
+  .user-name-text,
+  .session-time-text,
+  .meta-link-action {
+    font-size: 10px;
   }
 
   .user-role-tag {
@@ -436,9 +438,8 @@ body.light .header-fixed-container.is-scrolled .main-nav-bar {
   }
 
   /* 모바일 토글 스위치 위치 조정 */
-  .tech-theme-switch {
+  .minimal-theme-toggle {
     margin-top: 16px;
     align-self: flex-start;
-    padding: 6px 0;
   }
 }

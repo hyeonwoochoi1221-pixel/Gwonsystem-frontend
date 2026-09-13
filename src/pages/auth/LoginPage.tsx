@@ -5,9 +5,12 @@ import Logo from '../../assets/logo.svg?react';
 import { loginMember } from '../../api/authService';
 import './Auth.css';
 
+// 백엔드 LoginResponse DTO 규격 반영
 interface LoginResponse {
   message?: string;
   username?: string;
+  firstName?: string;
+  lastName?: string;
   role?: string;
 }
 
@@ -26,19 +29,33 @@ export default function LoginPage() {
     try {
       const res = (await loginMember({ username, password })) as LoginResponse;
 
-      // 1. 사용자명 및 권한 정보 localStorage 보관
-      if (res?.role) {
-        localStorage.setItem('userRole', res.role);
-      }
+      // 1. 기본 계정 정보 및 권한 localStorage 보관
       if (res?.username) {
         localStorage.setItem('username', res.username);
       }
+      if (res?.role) {
+        localStorage.setItem('userRole', res.role);
+      }
 
-      // 2. 브라우저 alert 대신 우측 상단 토스트 알림 출력
-      const welcomeName = res?.username || username;
+      // 2. DB에서 전달된 성(lastName)과 이름(firstName) localStorage 보관
+      if (res?.lastName) {
+        localStorage.setItem('lastName', res.lastName);
+      } else {
+        localStorage.removeItem('lastName');
+      }
+
+      if (res?.firstName) {
+        localStorage.setItem('firstName', res.firstName);
+      } else {
+        localStorage.removeItem('firstName');
+      }
+
+      // 3. 환영 토스트 메시지 구성 (성+이름 우선, 없을 시 아이디 fallback)
+      const fullName = `${res?.lastName || ''}${res?.firstName || ''}`.trim();
+      const welcomeName = fullName || res?.username || username;
       toast.success(`${welcomeName}님, 로그인되었습니다.`);
 
-      // 3. 메인 홈으로 전환
+      // 4. 메인 대시보드로 이동
       navigate('/');
     } catch (error: any) {
       console.error('로그인 에러:', error);
@@ -47,7 +64,6 @@ export default function LoginPage() {
         (typeof error.response?.data === 'string' ? error.response.data : null) ||
         '아이디 또는 비밀번호가 올바르지 않습니다.';
 
-      // 화면 내 붉은색 알림 박스 및 에러 토스트 동시 지원
       setErrorMessage(serverMessage);
       toast.error(serverMessage);
     } finally {

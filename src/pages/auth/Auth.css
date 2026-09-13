@@ -202,6 +202,122 @@
   background-color: var(--border-color);
 }
 
+/* ==========================================================================
+   📅 생년월일 달력 피커 & 🏠 우편번호 검색 스타일
+   ========================================================================== */
+
+/* 생년월일 달력 인풋 커스텀 */
+.input-date-picker {
+  cursor: pointer;
+  color-scheme: dark; /* 브라우저 캘린더 피커의 다크 테마 적용 */
+}
+
+body.light .input-date-picker {
+  color-scheme: light; /* 라이트 테마 시 브라우저 캘린더 기본 적용 */
+}
+
+/* 우편번호 검색 행 */
+.postcode-search-row {
+  display: flex;
+  gap: 8px;
+}
+
+/* 읽기 전용 인풋 (우편번호 및 도로명 기본주소) */
+.input-readonly {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  cursor: default;
+}
+
+body.light .input-readonly {
+  background-color: rgba(0, 0, 0, 0.03) !important;
+}
+
+/* 우편번호 검색 버튼 */
+.btn-address-search {
+  flex-shrink: 0;
+  padding: 0 16px;
+  background-color: var(--accent-color);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+}
+
+.btn-address-search:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+.btn-address-search:active {
+  transform: translateY(0);
+}
+
+/* ==========================================================================
+   🔍 카카오 우편번호 검색 모달 레이어
+   ========================================================================== */
+.postcode-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(4px);
+}
+
+.postcode-modal-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 480px;
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  animation: authAlertFadeIn 0.25s ease-out;
+}
+
+.postcode-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-card);
+}
+
+.postcode-modal-header h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.btn-modal-close {
+  background: transparent;
+  border: none;
+  color: var(--text-sub);
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0 4px;
+  transition: color 0.15s ease;
+}
+
+.btn-modal-close:hover {
+  color: #ef4444;
+}
+
+/* ==========================================================================
+   법률 고지 약관 & 동의
+   ========================================================================== */
+
 /* 법률 고지 약관 박스 */
 .privacy-clause-box {
   background-color: var(--bg-hover);
@@ -395,5 +511,9 @@
 
   .auth-header h2 {
     font-size: 20px;
+  }
+
+  .postcode-modal-content {
+    width: 95%;
   }
 }

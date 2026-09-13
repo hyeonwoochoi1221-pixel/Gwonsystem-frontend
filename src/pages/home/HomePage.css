@@ -151,7 +151,7 @@
   border-radius: 4px;
 }
 
-/* 공지사항 목록 - 기본 왼쪽 정렬 강제 */
+/* 공지사항 목록 */
 .portal-notice-list {
   list-style: none;
   padding: 0;
@@ -261,7 +261,7 @@
 }
 
 /* ===================================================
-   3. About Us & Location 섹션 (PC 기본)
+   3. About Us & Location 섹션
    =================================================== */
 .section-wrapper {
   max-width: 1400px;
@@ -271,16 +271,22 @@
   box-sizing: border-box;
 }
 
+.section-header {
+  text-align: left;
+}
+
 .section-header h2 {
   font-size: 28px;
   margin-bottom: 8px;
   color: var(--text-main);
+  text-align: left;
 }
 
 .section-header p {
   color: var(--text-sub);
   font-size: 14px;
   margin-top: 0;
+  text-align: left;
 }
 
 .about-grid {
@@ -290,6 +296,7 @@
   margin-top: 24px;
 }
 
+/* About Us 정보 카드 */
 .about-info-card {
   background: var(--bg-card);
   padding: 36px;
@@ -297,55 +304,92 @@
   border: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
+  text-align: left;
   box-sizing: border-box;
+  gap: 20px;
 }
 
 .about-info-card h3 {
-  margin-top: 0;
+  margin: 0 0 8px 0;
   font-size: 20px;
+  font-weight: 700;
   color: var(--text-main);
+  text-align: left;
 }
 
 .about-info-card p {
   color: var(--text-sub);
   line-height: 1.6;
   font-size: 14px;
+  margin: 0;
+  text-align: left;
+}
+
+/* 회사 정보 디테일 그룹 */
+.company-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+  text-align: left;
 }
 
 .company-details p {
-  margin: 6px 0;
+  margin: 0;
   font-size: 14px;
   color: var(--text-main);
+  line-height: 1.6;
+  text-align: left;
 }
 
+/* 항목별 행(Detail Row) */
 .company-details .detail-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
-  margin: 8px 0;
+  margin: 0;
   font-size: 14px;
-  flex-wrap: wrap;
+  text-align: left;
+  line-height: 1.6;
 }
 
+/* ★ "대표 이메일:" 포함 모든 라벨을 다른 텍스트와 동일한 색상/굵기로 통일 */
+.company-details .detail-label {
+  font-weight: 700;
+  color: var(--text-main);  /* 다른 항목과 동일하게 진한 기본 텍스트 색상 적용 */
+  white-space: nowrap;      /* 글자 쪼개짐 방지 */
+  flex-shrink: 0;
+}
+
+/* 이메일 주소 그룹 */
 .email-group {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
 }
 
 .email-group a {
-  color: var(--accent-color);
-  text-decoration: none;
+  color: var(--text-main);       /* 기본 텍스트 색상으로 차분하게 통일 */
+  text-decoration: underline;    /* 링크 식별용 밑줄 */
+  text-underline-offset: 3px;
+  font-size: 14px;
+  word-break: break-all;
+  display: inline-block;
+  line-height: 1.6;
+  transition: color 0.15s ease;
 }
 
 .email-group a:hover {
-  text-decoration: underline;
+  color: var(--accent-color);    /* 마우스 호버 시에만 포인트 컬러 강조 */
 }
 
 .email-group .divider {
-  color: var(--text-sub);
-  font-size: 12px;
+  display: none;
 }
 
 .map-container {
@@ -360,7 +404,6 @@
    반응형 브레이크포인트 (모바일/태블릿 최적화)
    =================================================== */
 @media (max-width: 768px) {
-  /* 1. 상단 배너 모바일 스케일 조정 */
   .portal-hero-banner {
     min-height: auto;
     padding: 40px 16px 36px;
@@ -404,7 +447,6 @@
     word-break: keep-all;
   }
 
-  /* 캡슐 뱃지: 세로 2열 배치로 텍스트 겹침 방지 */
   .hero-meta-badge {
     display: flex;
     flex-direction: column;
@@ -426,7 +468,6 @@
     display: none;
   }
 
-  /* 2. 중앙 2x2 카드 -> 1열 단일 배치 및 정중앙 정렬 */
   .portal-grid-section {
     grid-template-columns: 100%;
     width: 100%;
@@ -460,7 +501,6 @@
     font-size: 11px;
   }
 
-  /* 행사, 갤러리, About 카드 1열 전환 */
   .event-grid,
   .gallery-thumbnail-row,
   .about-grid {
@@ -478,7 +518,7 @@
   }
 
   .about-info-card {
-    padding: 20px 16px;
+    padding: 24px 18px;
     width: 100%;
   }
 

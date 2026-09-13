@@ -46,9 +46,9 @@ export default function Footer() {
 
         {/* 푸터 텍스트 영역 (가운데 정렬) */}
         <div className="footer-info">
-          <p className="company-text"><strong>GWON SYSTEM</strong> | 대표자: 최현우</p>
-          <p className="company-text">본사: 대한민국 경기도 평택시 | 문의: contact@gwonsystem.com</p>
-          <p className="copyright">© {currentYear} GWON System Inc. All Rights Reserved.</p>
+          <p className="company-text"><strong>G-WON SYSTEM</strong> | 대표자: 최병환</p>
+          <p className="company-text">서울특별시 서초구 방배동 1002-14 서초타운 202호 | 문의: cmbhchoi@gwonsystem.com</p>
+          <p className="copyright">© {currentYear} G-WON System Inc. All Rights Reserved.</p>
         </div>
       </div>
     </footer>

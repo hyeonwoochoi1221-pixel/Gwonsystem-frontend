@@ -135,20 +135,18 @@ export default function HomePage() {
               엔터프라이즈 사내 인프라 및 대고객 웹 환경을 제공합니다.
             </p>
             <div className="company-details">
-              <p><strong>대표자:</strong> 최현우 대표</p>
-              <p><strong>본사 주소:</strong> 대한민국 경기도 평택시</p>
-
+              <p><strong>Representative Director:</strong> 최병환(Brian Choi)</p>
+              <p><strong>Address:</strong> 서울특별시 서초구 방배동 1002-14 서초타운 202호</p>
+              <p><strong>Tel:</strong> 010-3917-1928</p>
+              <p><strong>Fax:</strong> 02-598-1924</p>
               {/* 이메일 2개 가로 정렬 유지 */}
               <div className="detail-row">
-                <strong>대표 이메일:</strong>
-                <span className="email-group">
-                  <a href="mailto:admin@gwonsystem.com">admin@gwonsystem.com</a>
-                  <span className="divider">/</span>
-                  <a href="mailto:contact@gwonsystem.com">contact@gwonsystem.com</a>
-                </span>
+                <span className="detail-label">E-mail:</span>
+                <div className="email-group">
+                  <a href="mailto:cmbhchoi@gwonsystem.com">cmbhchoi@gwonsystem.com</a>
+                  <a href="mailto:cmbhchoi@naver.com">cmbhchoi@naver.com</a>
+                </div>
               </div>
-
-              <p><strong>기술 지원 문의:</strong> 031-000-0000</p>
             </div>
           </div>
 
@@ -156,7 +154,7 @@ export default function HomePage() {
           <div className="map-container">
             <iframe
               title="GWON SYSTEM 위치"
-              src="https://maps.google.com/maps?q=Pyeongtaek-si,%20Gyeonggi-do,%20Republic%20of%20Korea&t=&z=13&ie=UTF8&iwloc=&output=embed"
+              src="https://www.google.com/maps/embed?pb=!1m5!3m3!1m2!1s0x357ca104edf5147f%3A0x642c12d36829e252!2z64yA7ZWc66-86rWtIOyEnOyauO2KueuzhOyLnCDshJzstIjqtawg66qF64us66GcIDE5!5e0!3m2!1sko!2sus!4v1789302678606!5m2!1sko!2sus"
               width="100%"
               height="100%"
               style={{ border: 0, borderRadius: '8px' }}
