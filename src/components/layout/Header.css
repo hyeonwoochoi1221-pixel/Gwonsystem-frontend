@@ -18,7 +18,7 @@
 }
 
 .logo-svg {
-  width: 55px;         /* 로고의 가로 크기 (필요시 조절 가능) */
+  width: 40px;         /* 로고의 가로 크기 (필요시 조절 가능) */
   height: auto;        /* 비율 유지 */
   display: block;
 }
