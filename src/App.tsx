@@ -8,6 +8,7 @@ import HomePage from './pages/home/HomePage';
 import NoticeListPage from './pages/notice/NoticeListPage';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
+import OAuthCallback from './pages/auth/OAuthCallback'; // ★ 소셜 로그인 콜백 컴포넌트 추가
 import './App.css';
 
 export default function App() {
@@ -51,6 +52,9 @@ export default function App() {
           <Route path="/notice" element={<NoticeListPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+
+          {/* ★ 구글/네이버 OAuth2 콜백 처리 라우트 */}
+          <Route path="/oauth/callback" element={<OAuthCallback />} />
         </Routes>
         <Footer />
         <ScrollToTopButton />

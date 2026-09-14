@@ -16,7 +16,7 @@ export default function HomePage() {
 
   return (
     <div className="academic-home-container">
-      {/* 1. 상단 대형 와이드 배너 (로고 + 학회/컨퍼런스 스타일 비주얼) */}
+      {/* 1. 상단 대형 와이드 배너 */}
       <section className="portal-hero-banner">
         <div className="hero-banner-content">
           <div className="hero-logo-badge">
