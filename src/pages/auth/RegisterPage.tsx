@@ -4,7 +4,12 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import DaumPostcodeEmbed from 'react-daum-postcode';
 import toast from 'react-hot-toast';
 import Logo from '../../assets/logo.svg?react';
-import { registerMember, checkUsernameDuplicate } from '../../api/authService';
+import {
+  registerMember,
+  checkUsernameDuplicate,
+  sendEmailVerificationCode,
+  verifyEmailCode,
+} from '../../api/authService';
 import { RegisterRequestPayload } from '../../types';
 import './Auth.css';
 
@@ -36,18 +41,19 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // 🎯 소셜 로그인 리다이렉트 파라미터 파싱
+  // 소셜 로그인 리다이렉트 파라미터 파싱
   const socialEmail = searchParams.get('socialEmail');
   const socialLastName = searchParams.get('socialLastName');
   const socialFirstName = searchParams.get('socialFirstName');
   const socialProvider = searchParams.get('socialProvider');
   const socialProviderId = searchParams.get('socialProviderId');
 
-  // 오류 발생 시 화면 스크롤 및 커서 포커스를 위한 Refs
+  // 포커싱 및 스크롤용 Refs
   const usernameRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const passwordConfirmRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
+  const emailCodeRef = useRef<HTMLInputElement>(null);
   const lastNameRef = useRef<HTMLInputElement>(null);
   const firstNameRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
@@ -81,10 +87,19 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
 
-  // 🔍 아이디 중복 확인 관련 상태
+  // 🔍 아이디 중복 확인 상태
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const [isUsernameChecked, setIsUsernameChecked] = useState(false);
   const [usernameSuccessMsg, setUsernameSuccessMsg] = useState<string | null>(null);
+
+  // 📧 이메일 6자리 OTP 인증 상태
+  const [isEmailSending, setIsEmailSending] = useState(false);
+  const [isEmailCodeSent, setIsEmailCodeSent] = useState(false);
+  const [inputEmailCode, setInputEmailCode] = useState('');
+  const [isEmailVerifying, setIsEmailVerifying] = useState(false);
+  // 소셜 로그인 진입 시 이미 인증된 이메일로 간주
+  const [isEmailVerified, setIsEmailVerified] = useState(Boolean(socialEmail));
+  const [emailTimer, setEmailTimer] = useState(180); // 3분(180초)
 
   // 🌟 회원가입 완료 축하 모달 제어 상태
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
@@ -102,6 +117,25 @@ export default function RegisterPage() {
     }
   }, [socialProvider]);
 
+  // 3분 카운트다운 타이머 처리
+  useEffect(() => {
+    let interval: any = null;
+    if (isEmailCodeSent && !isEmailVerified && emailTimer > 0) {
+      interval = setInterval(() => {
+        setEmailTimer((prev) => prev - 1);
+      }, 1000);
+    } else if (emailTimer === 0) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [isEmailCodeSent, isEmailVerified, emailTimer]);
+
+  const formatTimer = (seconds: number): string => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
+
   const scrollToErrorField = (ref: { current: HTMLElement | null }) => {
     if (ref.current) {
       ref.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -111,6 +145,7 @@ export default function RegisterPage() {
     }
   };
 
+  // 1. 아이디 중복 확인 핸들러
   const handleCheckUsername = async () => {
     const rawUsername = formData.username.trim();
     if (!rawUsername) {
@@ -152,6 +187,71 @@ export default function RegisterPage() {
       toast.error(msg);
     } finally {
       setIsCheckingUsername(false);
+    }
+  };
+
+  // 2. 이메일 인증번호 발송 핸들러
+  const handleSendEmailCode = async () => {
+    const email = formData.email.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!email || !emailRegex.test(email)) {
+      const msg = '유효한 이메일 주소를 먼저 입력해 주세요.';
+      setFieldErrors((prev) => ({ ...prev, email: msg }));
+      toast.error(msg);
+      scrollToErrorField(emailRef);
+      return;
+    }
+
+    setIsEmailSending(true);
+    setErrorMsg(null);
+
+    try {
+      await sendEmailVerificationCode(email);
+      setIsEmailCodeSent(true);
+      setEmailTimer(180); // 3분 리셋
+      setFieldErrors((prev) => ({ ...prev, email: '' }));
+      toast.success('입력하신 메일로 6자리 인증번호가 발송되었습니다.');
+      setTimeout(() => emailCodeRef.current?.focus(), 150);
+    } catch (err: any) {
+      console.error('인증메일 발송 실패:', err);
+      const msg = err.response?.data?.message || '인증번호 발송에 실패했습니다. 메일 주소를 확인해 주세요.';
+      setFieldErrors((prev) => ({ ...prev, email: msg }));
+      toast.error(msg);
+    } finally {
+      setIsEmailSending(false);
+    }
+  };
+
+  // 3. 이메일 인증번호 검증 핸들러
+  const handleVerifyEmailCode = async () => {
+    if (!inputEmailCode.trim() || inputEmailCode.trim().length !== 6) {
+      toast.error('6자리 인증번호를 올바르게 입력해 주세요.');
+      emailCodeRef.current?.focus();
+      return;
+    }
+
+    if (emailTimer <= 0) {
+      toast.error('인증 유효시간(3분)이 초과되었습니다. 인증번호를 다시 요청해 주세요.');
+      return;
+    }
+
+    setIsEmailVerifying(true);
+
+    try {
+      const res = await verifyEmailCode(formData.email.trim(), inputEmailCode.trim());
+      if (res.verified) {
+        setIsEmailVerified(true);
+        setIsEmailCodeSent(false);
+        setFieldErrors((prev) => ({ ...prev, email: '' }));
+        toast.success('이메일 인증이 완료되었습니다.');
+      }
+    } catch (err: any) {
+      console.error('인증번호 검증 실패:', err);
+      const msg = err.response?.data?.message || '인증번호가 일치하지 않습니다.';
+      toast.error(msg);
+    } finally {
+      setIsEmailVerifying(false);
     }
   };
 
@@ -239,6 +339,11 @@ export default function RegisterPage() {
         msg = '올바른 이메일 주소 형식(@, 도메인 포함)이 아닙니다.';
       }
       setFieldErrors((prev) => ({ ...prev, email: msg }));
+      // 이메일 변경 시 인증 상태 초기화
+      if (!socialEmail) {
+        setIsEmailVerified(false);
+        setIsEmailCodeSent(false);
+      }
     }
 
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -309,6 +414,14 @@ export default function RegisterPage() {
       return;
     }
 
+    if (!isEmailVerified) {
+      const msg = '이메일 인증을 완료해야 회원가입이 가능합니다.';
+      setErrorMsg(msg);
+      toast.error(msg);
+      scrollToErrorField(emailRef);
+      return;
+    }
+
     if (formData.password.length < 8) {
       const msg = '비밀번호는 8자 이상 입력해야 합니다.';
       setErrorMsg(msg);
@@ -322,15 +435,6 @@ export default function RegisterPage() {
       setErrorMsg(msg);
       toast.error(msg);
       scrollToErrorField(passwordConfirmRef);
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      const msg = '올바른 이메일 주소를 입력해 주세요.';
-      setErrorMsg(msg);
-      toast.error(msg);
-      scrollToErrorField(emailRef);
       return;
     }
 
@@ -398,6 +502,7 @@ export default function RegisterPage() {
 
       if (backendMessage.includes('이메일') || backendMessage.toLowerCase().includes('email')) {
         setFieldErrors((prev) => ({ ...prev, email: backendMessage }));
+        setIsEmailVerified(false);
         scrollToErrorField(emailRef);
       } else if (
         backendMessage.includes('전화번호') ||
@@ -442,7 +547,6 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        {/* 🌟 소셜 연동 진행 안내 배너 */}
         {socialProvider && (
           <div className="auth-success-alert">
             🔗 <strong>{socialProvider}</strong> 계정 인증 완료! 사용할 아이디와 기본 정보를 설정하면 가입 즉시 연동됩니다.
@@ -526,22 +630,67 @@ export default function RegisterPage() {
             </div>
           </div>
 
+          {/* 📧 이메일 및 6자리 OTP 인증번호 발송 영역 */}
           <div className="form-group">
             <label htmlFor="reg-email">
               이메일 주소 <span className="req">*</span>
             </label>
-            <input
-              ref={emailRef}
-              id="reg-email"
-              name="email"
-              type="email"
-              placeholder="user@gwonsystem.com"
-              value={formData.email}
-              onChange={handleInputChange}
-              className={fieldErrors.email ? 'input-invalid' : ''}
-              disabled={isLoading || Boolean(socialEmail)}
-              required
-            />
+            <div className="email-input-row">
+              <input
+                ref={emailRef}
+                id="reg-email"
+                name="email"
+                type="email"
+                placeholder="user@gwonsystem.com"
+                value={formData.email}
+                onChange={handleInputChange}
+                className={fieldErrors.email ? 'input-invalid' : ''}
+                disabled={isLoading || Boolean(socialEmail) || isEmailVerified}
+                required
+              />
+              {!socialEmail && !isEmailVerified && (
+                <button
+                  type="button"
+                  className="btn-email-action"
+                  onClick={handleSendEmailCode}
+                  disabled={isLoading || isEmailSending}
+                >
+                  {isEmailSending ? '발송 중...' : isEmailCodeSent ? '재발송' : '인증번호 전송'}
+                </button>
+              )}
+            </div>
+
+            {/* 인증번호 입력 & 타이머 박스 */}
+            {isEmailCodeSent && !isEmailVerified && (
+              <div className="email-otp-box">
+                <div className="otp-action-row">
+                  <div className="otp-input-wrapper">
+                    <input
+                      ref={emailCodeRef}
+                      type="text"
+                      placeholder="6자리 인증코드 입력"
+                      value={inputEmailCode}
+                      onChange={(e) => setInputEmailCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      maxLength={6}
+                      disabled={isEmailVerifying}
+                    />
+                    <span className="otp-timer">{formatTimer(emailTimer)}</span>
+                  </div>
+                  <button
+                    type="button"
+                    className="btn-email-action"
+                    onClick={handleVerifyEmailCode}
+                    disabled={isEmailVerifying || inputEmailCode.length !== 6 || emailTimer <= 0}
+                  >
+                    {isEmailVerifying ? '확인 중...' : '인증 확인'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {isEmailVerified && (
+              <span className="field-success-msg">✓ 이메일 본인 인증이 완료되었습니다.</span>
+            )}
             {fieldErrors.email && <span className="field-error-msg">⚠️ {fieldErrors.email}</span>}
           </div>
 
@@ -761,7 +910,7 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          {/* 5. 개인정보보호법에 따른 법률 고지 및 동의 */}
+          {/* 5. 약관 및 개인정보 동의 */}
           <div className="form-section-title">약관 및 개인정보 수집 동의</div>
 
           <div className="privacy-clause-box">
@@ -861,7 +1010,7 @@ export default function RegisterPage() {
         </div>
       )}
 
-      {/* 🎉 회원가입 완료 축하 팝업 모달 */}
+      {/* 회원가입 완료 축하 모달 */}
       {isSuccessModalOpen && (
         <div className="register-success-modal-overlay">
           <div className="register-success-modal-content">

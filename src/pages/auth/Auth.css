@@ -203,15 +203,17 @@
 }
 
 /* ==========================================================================
-   🔑 아이디 중복 확인 행 및 버튼 스타일
+   🔑 중복 확인 & 인증번호 버튼 공통 행 스타일
    ========================================================================== */
-.id-check-row {
+.id-check-row,
+.email-input-row {
   display: flex;
   gap: 8px;
   width: 100%;
 }
 
-.btn-id-check {
+.btn-id-check,
+.btn-email-action {
   flex-shrink: 0;
   padding: 0 16px;
   background-color: var(--accent-color);
@@ -225,33 +227,80 @@
   white-space: nowrap;
 }
 
-.btn-id-check:hover:not(:disabled) {
+.btn-id-check:hover:not(:disabled),
+.btn-email-action:hover:not(:disabled) {
   opacity: 0.88;
   transform: translateY(-1px);
 }
 
-.btn-id-check:active:not(:disabled) {
+.btn-id-check:active:not(:disabled),
+.btn-email-action:active:not(:disabled) {
   transform: translateY(0);
 }
 
-.btn-id-check:disabled {
+.btn-id-check:disabled,
+.btn-email-action:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-/* 사용 가능 초록색 안내 문구 */
+/* ==========================================================================
+   📧 이메일 인증번호 입력 박스 및 타이머 스타일
+   ========================================================================== */
+.email-otp-box {
+  margin-top: 6px;
+  padding: 12px;
+  background-color: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: authAlertFadeIn 0.25s ease-out;
+}
+
+.otp-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.otp-input-wrapper input {
+  padding-right: 60px;
+  letter-spacing: 2px;
+  font-weight: 700;
+}
+
+.otp-timer {
+  position: absolute;
+  right: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ef4444;
+  font-family: monospace;
+}
+
+.otp-action-row {
+  display: flex;
+  gap: 8px;
+}
+
+/* 초록색 성공 안내 문구 */
 .field-success-msg {
   font-size: 12px;
   color: #10b981;
   margin-top: 4px;
   line-height: 1.3;
   animation: authAlertFadeIn 0.2s ease-out;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 /* ==========================================================================
    📅 생년월일 달력 피커 & 🏠 우편번호 검색 스타일
    ========================================================================== */
-
 .input-date-picker {
   cursor: pointer;
   color-scheme: dark;
@@ -359,7 +408,6 @@ body.light .input-readonly {
 /* ==========================================================================
    법률 고지 약관 & 동의
    ========================================================================== */
-
 .privacy-clause-box {
   background-color: var(--bg-hover);
   border: 1px solid var(--border-color);
