@@ -1,6 +1,6 @@
 // src/pages/auth/RegisterPage.tsx
-import React, { useState, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import DaumPostcodeEmbed from 'react-daum-postcode';
 import toast from 'react-hot-toast';
 import Logo from '../../assets/logo.svg?react';
@@ -34,8 +34,16 @@ const formatWorkplacePhone = (value: string): string => {
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
-  // 🎯 오류 발생 시 화면 스크롤 및 커서 포커스를 위한 Refs
+  // 🎯 소셜 로그인 리다이렉트 파라미터 파싱
+  const socialEmail = searchParams.get('socialEmail');
+  const socialLastName = searchParams.get('socialLastName');
+  const socialFirstName = searchParams.get('socialFirstName');
+  const socialProvider = searchParams.get('socialProvider');
+  const socialProviderId = searchParams.get('socialProviderId');
+
+  // 오류 발생 시 화면 스크롤 및 커서 포커스를 위한 Refs
   const usernameRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const passwordConfirmRef = useRef<HTMLInputElement>(null);
@@ -45,12 +53,12 @@ export default function RegisterPage() {
   const phoneRef = useRef<HTMLInputElement>(null);
   const termsGroupRef = useRef<HTMLDivElement>(null);
 
-  const [formData, setFormData] = useState<RegisterRequestPayload>({
+  const [formData, setFormData] = useState<RegisterRequestPayload & { provider?: string; providerId?: string }>({
     username: '',
     password: '',
-    email: '',
-    lastName: '',
-    firstName: '',
+    email: socialEmail ? decodeURIComponent(socialEmail) : '',
+    lastName: socialLastName ? decodeURIComponent(socialLastName) : '',
+    firstName: socialFirstName ? decodeURIComponent(socialFirstName) : '',
     phone: '',
     zipcode: '',
     address: '',
@@ -64,6 +72,8 @@ export default function RegisterPage() {
     termsAgreed: false,
     privacyAgreed: false,
     marketingAgreed: false,
+    provider: socialProvider || undefined,
+    providerId: socialProviderId ? decodeURIComponent(socialProviderId) : undefined,
   });
 
   const [passwordConfirm, setPasswordConfirm] = useState('');
@@ -83,7 +93,15 @@ export default function RegisterPage() {
   // 각 필드별 실시간 피드백 에러 상태
   const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
 
-  // 🌟 null 허용 객체 인터페이스({ current: HTMLElement | null })로 타입 지정
+  useEffect(() => {
+    if (socialProvider) {
+      toast(`${socialProvider} 계정 정보가 자동 입력되었습니다. 사용할 아이디와 정보를 입력해주세요!`, {
+        icon: '🔗',
+        duration: 4000,
+      });
+    }
+  }, [socialProvider]);
+
   const scrollToErrorField = (ref: { current: HTMLElement | null }) => {
     if (ref.current) {
       ref.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -93,7 +111,6 @@ export default function RegisterPage() {
     }
   };
 
-  // 🌟 아이디 중복 확인 버튼 핸들러
   const handleCheckUsername = async () => {
     const rawUsername = formData.username.trim();
     if (!rawUsername) {
@@ -141,7 +158,6 @@ export default function RegisterPage() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
 
-    // 1. 아이디 실시간 제어
     if (name === 'username') {
       let msg = '';
       if (/[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(value)) {
@@ -161,7 +177,6 @@ export default function RegisterPage() {
       return;
     }
 
-    // 2. 성 (lastName) 완화 (복성 지원)
     if (name === 'lastName') {
       let msg = '';
       if (/[0-9!@#$%^&*()_+={}\[\]:;"'<>,.?/\\|`~]/.test(value)) {
@@ -173,7 +188,6 @@ export default function RegisterPage() {
       return;
     }
 
-    // 3. 이름 (firstName) 완화
     if (name === 'firstName') {
       let msg = '';
       if (/[0-9!@#$%^&*()_+={}\[\]:;"'<>,.?/\\|`~]/.test(value)) {
@@ -185,7 +199,6 @@ export default function RegisterPage() {
       return;
     }
 
-    // 4. 휴대폰 번호
     if (name === 'phone') {
       let msg = '';
       if (/[^0-9-]/.test(value)) {
@@ -200,14 +213,12 @@ export default function RegisterPage() {
       return;
     }
 
-    // 5. 근무처 전화번호
     if (name === 'workplacePhone') {
       const formatted = formatWorkplacePhone(value);
       setFormData((prev) => ({ ...prev, [name]: formatted }));
       return;
     }
 
-    // 6. 비밀번호 검증
     if (name === 'password') {
       const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
       let msg = '';
@@ -221,7 +232,6 @@ export default function RegisterPage() {
       }));
     }
 
-    // 7. 이메일 검증
     if (name === 'email') {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       let msg = '';
@@ -283,7 +293,6 @@ export default function RegisterPage() {
     e.preventDefault();
     setErrorMsg(null);
 
-    // 1. 프론트엔드 유효성 사전 검증
     if (formData.username.length < 4) {
       const msg = '아이디를 4자리 이상 입력해 주세요.';
       setErrorMsg(msg);
@@ -371,7 +380,6 @@ export default function RegisterPage() {
     try {
       await registerMember(formData);
 
-      // 🎉 성공 시 페이지를 즉시 이탈하지 않고 완료 축하 모달을 띄움
       setCompletedUserData({
         username: formData.username,
         fullName: `${formData.lastName}${formData.firstName}`.trim(),
@@ -388,7 +396,6 @@ export default function RegisterPage() {
       setErrorMsg(backendMessage);
       toast.error(backendMessage);
 
-      // 백엔드 예외 발생 시 해당 문제 항목으로 스크롤 이동 및 포커싱
       if (backendMessage.includes('이메일') || backendMessage.toLowerCase().includes('email')) {
         setFieldErrors((prev) => ({ ...prev, email: backendMessage }));
         scrollToErrorField(emailRef);
@@ -413,7 +420,6 @@ export default function RegisterPage() {
     }
   };
 
-  // 모달 확인 후 로그인 페이지로 이동
   const handleProceedToLogin = () => {
     setIsSuccessModalOpen(false);
     toast.success('회원가입이 완료되었습니다. 로그인해 주세요!');
@@ -429,10 +435,20 @@ export default function RegisterPage() {
             <span className="auth-logo-text">GWON SYSTEM</span>
           </Link>
           <h2>신규 회원가입</h2>
-          <p>기본 인적사항 및 직장 정보를 입력해 계정을 생성합니다.</p>
+          <p>
+            {socialProvider
+              ? `${socialProvider} 계정과 연동될 포털 아이디 및 계정을 생성합니다.`
+              : '기본 인적사항 및 직장 정보를 입력해 계정을 생성합니다.'}
+          </p>
         </div>
 
-        {/* 상단 에러 배너 */}
+        {/* 🌟 소셜 연동 진행 안내 배너 */}
+        {socialProvider && (
+          <div className="auth-success-alert">
+            🔗 <strong>{socialProvider}</strong> 계정 인증 완료! 사용할 아이디와 기본 정보를 설정하면 가입 즉시 연동됩니다.
+          </div>
+        )}
+
         {errorMsg && <div className="auth-error-alert">{errorMsg}</div>}
 
         <form className="auth-form" onSubmit={handleSubmit}>
@@ -523,7 +539,7 @@ export default function RegisterPage() {
               value={formData.email}
               onChange={handleInputChange}
               className={fieldErrors.email ? 'input-invalid' : ''}
-              disabled={isLoading}
+              disabled={isLoading || Boolean(socialEmail)}
               required
             />
             {fieldErrors.email && <span className="field-error-msg">⚠️ {fieldErrors.email}</span>}
@@ -853,6 +869,11 @@ export default function RegisterPage() {
             <h3>회원가입이 완료되었습니다!</h3>
             <p>
               GWON SYSTEM 사내 포털의 일반회원으로 등록되었습니다.<br />
+              {formData.provider && (
+                <span style={{ color: 'var(--accent-color)', fontWeight: 600 }}>
+                  ({formData.provider} 소셜 계정과 연동되었습니다)<br />
+                </span>
+              )}
               생성된 계정으로 로그인해 주세요.
             </p>
 
