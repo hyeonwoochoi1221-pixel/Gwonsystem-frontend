@@ -1,5 +1,5 @@
 // src/App.tsx
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
@@ -8,13 +8,27 @@ import HomePage from './pages/home/HomePage';
 import NoticeListPage from './pages/notice/NoticeListPage';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
-import OAuthCallback from './pages/auth/OAuthCallback'; // ★ 소셜 로그인 콜백 컴포넌트 추가
+import OAuthCallback from './pages/auth/OAuthCallback';
+import ProfilePage from './pages/profile/ProfilePage'; // 🌟 회원 정보수정 및 정회원 신청 페이지
+
+// 🛡️ 슈퍼바이저 관리자 레이아웃 및 하위 뷰
+import SupervisorAdminPage from './pages/admin/SupervisorAdminPage';
+import PromotionApprovalView from './pages/admin/views/PromotionApprovalView';
+import UserManagementView from './pages/admin/views/UserManagementView';
+import OrgStructureView from './pages/admin/views/OrgStructureView';
+import SecurityLogsView from './pages/admin/views/SecurityLogsView';
+
+// 🏢 연구소 포털 레이아웃 및 하위 뷰
+import RegularPortalPage from './pages/portal/RegularPortalPage';
+import PortalRoadmapView from './pages/portal/views/PortalRoadmapView';
+import PortalResearchNoteView from './pages/portal/views/PortalResearchNoteView';
+import PortalMilestonesView from './pages/portal/views/PortalMilestonesView';
+import PortalAttendanceView from './pages/portal/views/PortalAttendanceView';
 import './App.css';
 
 export default function App() {
   return (
     <Router>
-      {/* 🌟 세련된 토스트 팝업 컨테이너 등록 */}
       <Toaster
         position="top-right"
         reverseOrder={false}
@@ -48,13 +62,33 @@ export default function App() {
       <div className="app-container">
         <Header />
         <Routes>
+          {/* 1. 공개 페이지 라우트 */}
           <Route path="/" element={<HomePage />} />
           <Route path="/notice" element={<NoticeListPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-
-          {/* ★ 구글/네이버 OAuth2 콜백 처리 라우트 */}
           <Route path="/oauth/callback" element={<OAuthCallback />} />
+
+          {/* 🌟 2. 회원정보 수정 & 정회원 승격 신청 라우트 */}
+          <Route path="/profile" element={<ProfilePage />} />
+
+          {/* 3. 🛡️ 슈퍼바이저 관리자 콘솔 (사이드바 중첩 라우트) */}
+          <Route path="/admin" element={<SupervisorAdminPage />}>
+            <Route index element={<Navigate to="promotions" replace />} />
+            <Route path="promotions" element={<PromotionApprovalView />} />
+            <Route path="users" element={<UserManagementView />} />
+            <Route path="org" element={<OrgStructureView />} />
+            <Route path="security" element={<SecurityLogsView />} />
+          </Route>
+
+          {/* 4. 🏢 정회원용 기업부설연구소 포털 (사이드바 중첩 라우트) */}
+          <Route path="/portal" element={<RegularPortalPage />}>
+            <Route index element={<Navigate to="roadmap" replace />} />
+            <Route path="roadmap" element={<PortalRoadmapView />} />
+            <Route path="notes" element={<PortalResearchNoteView />} />
+            <Route path="milestones" element={<PortalMilestonesView />} />
+            <Route path="attendance" element={<PortalAttendanceView />} />
+          </Route>
         </Routes>
         <Footer />
         <ScrollToTopButton />

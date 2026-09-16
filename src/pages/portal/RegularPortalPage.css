@@ -1,0 +1,445 @@
+/* src/pages/portal/RegularPortalPage.css */
+
+.portal-page-wrapper {
+  display: flex;
+  width: 100%;
+  min-height: calc(100vh - 105px);
+  background-color: var(--bg-main, #121214);
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   1. 좌측 고정 연구소 사이드바 (다크 테마 통일)
+   ========================================================= */
+.portal-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  background-color: var(--bg-card, #1a1a1e);
+  border-right: 1px solid var(--border-color, #2c2c35);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 30px 16px;
+  box-sizing: border-box;
+}
+
+.sidebar-header {
+  padding: 0 12px 24px;
+  border-bottom: 1px solid var(--border-color, #2c2c35);
+}
+
+.portal-badge-label {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--accent-color, #0ea5e9);
+  letter-spacing: 1.5px;
+  margin-bottom: 6px;
+}
+
+.sidebar-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-main, #f1f5f9);
+}
+
+/* 사이드바 메뉴 버튼 */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 24px;
+  flex: 1;
+}
+
+.portal-sidebar .nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--text-sub, #94a3b8);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.portal-sidebar .nav-btn:hover {
+  background-color: var(--bg-hover, #24242c);
+  color: var(--text-main, #f1f5f9);
+}
+
+.portal-sidebar .nav-btn.active {
+  background-color: rgba(14, 165, 233, 0.12);
+  border-color: rgba(14, 165, 233, 0.35);
+  color: #38bdf8;
+}
+
+.nav-icon {
+  font-size: 16px;
+}
+
+.nav-text {
+  flex: 1;
+}
+
+/* 사이드바 하단 상태 바 */
+.sidebar-footer {
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color, #2c2c35);
+}
+
+.researcher-info-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-sub, #94a3b8);
+}
+
+.online-indicator {
+  width: 8px;
+  height: 8px;
+  background-color: #38bdf8;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #38bdf8;
+}
+
+/* =========================================================
+   2. 우측 메인 콘텐츠 뷰포트
+   ========================================================= */
+.portal-main-viewport {
+  flex: 1;
+  padding: 40px 48px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.portal-content-block {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.portal-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.portal-title-row h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-main, #f1f5f9);
+  margin: 0 0 8px 0;
+}
+
+.portal-title-row p {
+  font-size: 14px;
+  color: var(--text-sub, #94a3b8);
+  margin: 0;
+}
+
+.action-control-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-export-excel {
+  background: transparent;
+  color: var(--text-main, #f1f5f9);
+  border: 1px solid var(--border-color, #2c2c35);
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-export-excel:hover {
+  background-color: var(--bg-hover, #24242c);
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+/* 캡슐형 뷰 토글 버튼 */
+.view-toggle-capsule {
+  display: inline-flex;
+  border: 1px solid var(--border-color, #2c2c35);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.btn-capsule {
+  padding: 8px 14px;
+  background: transparent;
+  border: none;
+  color: var(--text-sub, #94a3b8);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-capsule.active {
+  background-color: var(--accent-color, #0ea5e9);
+  color: #ffffff;
+}
+
+.btn-primary-action {
+  background: var(--accent-color, #0ea5e9);
+  color: #ffffff;
+  border: none;
+  padding: 9px 18px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.btn-primary-action:hover {
+  opacity: 0.88;
+}
+
+/* KPI 카드 4단 요약 */
+.kpi-summary-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.kpi-card {
+  flex: 1;
+  background: var(--bg-card, #1a1a1e);
+  border: 1px solid var(--border-color, #2c2c35);
+  border-radius: 8px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kpi-label {
+  font-size: 12px;
+  color: var(--text-sub, #94a3b8);
+}
+
+.kpi-value {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-main, #f1f5f9);
+}
+
+.kpi-value.highlight { color: #38bdf8; }
+.kpi-value.success { color: #10b981; }
+.kpi-value.normal { color: #a855f7; }
+
+/* 3. 과제별 보드 뷰 (2열 컬럼) */
+.project-board-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.project-column-card {
+  background: var(--bg-card, #1a1a1e);
+  border: 1px solid var(--border-color, #2c2c35);
+  border-radius: 10px;
+  padding: 22px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+}
+
+.phase-pill {
+  font-size: 11px;
+  font-weight: 700;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.12);
+  padding: 3px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
+.proj-card-header h3 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  color: var(--text-main, #f1f5f9);
+}
+
+.proj-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-sub, #94a3b8);
+  margin-bottom: 8px;
+}
+
+.progress-bar-bg {
+  width: 100%;
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #0284c7 0%, #38bdf8 100%);
+  border-radius: 3px;
+}
+
+.member-card-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.researcher-card {
+  background: var(--bg-hover, #202028);
+  border: 1px solid var(--border-color, #2c2c35);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.researcher-name {
+  font-weight: 700;
+  color: var(--text-main, #f1f5f9);
+  font-size: 14px;
+}
+
+.researcher-email {
+  font-size: 11px;
+  color: var(--text-sub, #94a3b8);
+  display: block;
+  margin: 4px 0 8px;
+}
+
+.rd-role-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(14, 165, 233, 0.15);
+  color: #38bdf8;
+}
+
+.rd-role-badge.director {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.tech-tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.skill-chip {
+  font-size: 11px;
+  color: var(--text-sub, #94a3b8);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* 4. 데이터 테이블 */
+.portal-table-card {
+  background: var(--bg-card, #1a1a1e);
+  border: 1px solid var(--border-color, #2c2c35);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+}
+
+.portal-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.portal-data-table th,
+.portal-data-table td {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-color, #2c2c35);
+  font-size: 13px;
+  color: var(--text-main, #f1f5f9);
+}
+
+.portal-data-table th {
+  background-color: rgba(255, 255, 255, 0.02);
+  color: var(--text-sub, #94a3b8);
+  font-weight: 600;
+}
+
+.col-emp-name {
+  font-weight: 700;
+  color: #38bdf8;
+}
+
+.col-proj-title {
+  font-weight: 600;
+}
+
+.col-email {
+  font-family: monospace;
+  color: var(--text-sub, #94a3b8);
+}
+
+.status-badge-ok {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.status-badge-pending {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+/* 플레이스홀더 */
+.portal-placeholder-card {
+  background: var(--bg-card, #1a1a1e);
+  border: 1px dashed var(--border-color, #2c2c35);
+  border-radius: 10px;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.portal-placeholder-card .placeholder-icon {
+  font-size: 42px;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.portal-placeholder-card h3 {
+  color: var(--text-main, #f1f5f9);
+  margin: 0 0 8px 0;
+  font-size: 18px;
+}
+
+.portal-placeholder-card p {
+  color: var(--text-sub, #94a3b8);
+  font-size: 14px;
+  margin: 0;
+}
