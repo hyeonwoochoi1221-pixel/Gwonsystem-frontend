@@ -1,18 +1,8 @@
 // src/pages/profile/ProfilePage.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import DaumPostcodeEmbed from 'react-daum-postcode';
 import toast from 'react-hot-toast';
 import './ProfilePage.css';
-
-// 카카오 우편번호 Daum 글로벌 인터페이스
-declare global {
-  interface Window {
-    daum?: {
-      Postcode: new (config: {
-        oncomplete: (data: { zonecode: string; address: string; buildingName?: string }) => void;
-      }) => { open: () => void };
-    };
-  }
-}
 
 export default function ProfilePage() {
   const [formData, setFormData] = useState({
@@ -45,34 +35,27 @@ export default function ProfilePage() {
   });
 
   const [isPromotionModalOpen, setIsPromotionModalOpen] = useState(false);
+  const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
 
-  // 카카오 우편번호 스크립트 로드
-  useEffect(() => {
-    if (!document.getElementById('daum-postcode-script')) {
-      const script = document.createElement('script');
-      script.id = 'daum-postcode-script';
-      script.src = '//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
-      script.async = true;
-      document.body.appendChild(script);
-    }
-  }, []);
+  // 카카오 우편번호 선택 완료 콜백 (타입 충돌 및 Deprecated 해결)
+  const handleCompletePostcode = (data: any) => {
+    let fullAddress = data.address;
+    let extraAddress = '';
 
-  // 카카오 우편번호 검색 팝업
-  const handleOpenPostcode = () => {
-    if (!window.daum?.Postcode) {
-      toast.error('주소 검색 서비스를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
-      return;
+    if (data.addressType === 'R') {
+      if (data.bname !== '') extraAddress += data.bname;
+      if (data.buildingName !== '') {
+        extraAddress += extraAddress !== '' ? `, ${data.buildingName}` : data.buildingName;
+      }
+      fullAddress += extraAddress !== '' ? ` (${extraAddress})` : '';
     }
-    new window.daum.Postcode({
-      oncomplete: (data) => {
-        setFormData((prev) => ({
-          ...prev,
-          zipcode: data.zonecode,
-          address: data.address,
-          detailAddress: data.buildingName ? `(${data.buildingName}) ` : '',
-        }));
-      },
-    }).open();
+
+    setFormData((prev) => ({
+      ...prev,
+      zipcode: data.zonecode,
+      address: fullAddress,
+    }));
+    setIsPostcodeOpen(false);
   };
 
   const handleInputChange = (
@@ -294,7 +277,7 @@ export default function ProfilePage() {
               </td>
             </tr>
 
-            {/* 6. 주소 (카카오 우편번호 연동) */}
+            {/* 6. 주소 (카카오 우편번호 모달 연동) */}
             <tr>
               <th><span className="dot">■</span> 주소</th>
               <td colSpan={3}>
@@ -310,7 +293,7 @@ export default function ProfilePage() {
                     <button
                       type="button"
                       className="btn-kakao-search"
-                      onClick={handleOpenPostcode}
+                      onClick={() => setIsPostcodeOpen(true)}
                     >
                       우편번호 검색 (카카오)
                     </button>
@@ -424,6 +407,26 @@ export default function ProfilePage() {
           </div>
         </form>
       </div>
+
+      {/* 🔍 카카오 우편번호 검색 모달 */}
+      {isPostcodeOpen && (
+        <div className="postcode-modal-overlay" onClick={() => setIsPostcodeOpen(false)}>
+          <div className="postcode-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="postcode-modal-header">
+              <h3>주소 검색</h3>
+              <button
+                type="button"
+                className="btn-modal-close"
+                onClick={() => setIsPostcodeOpen(false)}
+                aria-label="닫기"
+              >
+                ✕
+              </button>
+            </div>
+            <DaumPostcodeEmbed onComplete={handleCompletePostcode} autoClose />
+          </div>
+        </div>
+      )}
 
       {/* 정회원 승격 신청 모달 */}
       {isPromotionModalOpen && (

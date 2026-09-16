@@ -76,6 +76,10 @@ export default function RegisterPage() {
   const [isUsernameChecked, setIsUsernameChecked] = useState(false);
   const [usernameSuccessMsg, setUsernameSuccessMsg] = useState<string | null>(null);
 
+  // 🌟 회원가입 완료 축하 모달 제어 상태
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [completedUserData, setCompletedUserData] = useState<{ username: string; fullName: string } | null>(null);
+
   // 각 필드별 실시간 피드백 에러 상태
   const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
 
@@ -149,7 +153,6 @@ export default function RegisterPage() {
       }
 
       setFieldErrors((prev) => ({ ...prev, username: msg }));
-      // 아이디가 변경되면 기존 중복 확인 상태 리셋
       setIsUsernameChecked(false);
       setUsernameSuccessMsg(null);
 
@@ -280,7 +283,7 @@ export default function RegisterPage() {
     e.preventDefault();
     setErrorMsg(null);
 
-    // 1. 프론트엔드 검증 및 해당 오류 위치로 자동 포커싱 & 스크롤
+    // 1. 프론트엔드 유효성 사전 검증
     if (formData.username.length < 4) {
       const msg = '아이디를 4자리 이상 입력해 주세요.';
       setErrorMsg(msg);
@@ -367,8 +370,13 @@ export default function RegisterPage() {
 
     try {
       await registerMember(formData);
-      toast.success('회원가입이 완료되었습니다. 로그인해 주세요!');
-      navigate('/login');
+
+      // 🎉 성공 시 페이지를 즉시 이탈하지 않고 완료 축하 모달을 띄움
+      setCompletedUserData({
+        username: formData.username,
+        fullName: `${formData.lastName}${formData.firstName}`.trim(),
+      });
+      setIsSuccessModalOpen(true);
     } catch (err: any) {
       console.error('회원가입 실패:', err);
 
@@ -405,6 +413,13 @@ export default function RegisterPage() {
     }
   };
 
+  // 모달 확인 후 로그인 페이지로 이동
+  const handleProceedToLogin = () => {
+    setIsSuccessModalOpen(false);
+    toast.success('회원가입이 완료되었습니다. 로그인해 주세요!');
+    navigate('/login', { state: { registeredUsername: completedUserData?.username } });
+  };
+
   return (
     <div className="auth-page-container">
       <div className="auth-card register-card">
@@ -424,7 +439,6 @@ export default function RegisterPage() {
           {/* 1. 계정 정보 */}
           <div className="form-section-title">계정 정보 (필수)</div>
 
-          {/* 🌟 아이디 입력 및 우측 [중복 확인] 버튼 */}
           <div className="form-group">
             <label htmlFor="reg-username">
               아이디 <span className="req">*</span>
@@ -827,6 +841,41 @@ export default function RegisterPage() {
               </button>
             </div>
             <DaumPostcodeEmbed onComplete={handleCompletePostcode} autoClose />
+          </div>
+        </div>
+      )}
+
+      {/* 🎉 회원가입 완료 축하 팝업 모달 */}
+      {isSuccessModalOpen && (
+        <div className="register-success-modal-overlay">
+          <div className="register-success-modal-content">
+            <div className="success-icon-badge">✓</div>
+            <h3>회원가입이 완료되었습니다!</h3>
+            <p>
+              GWON SYSTEM 사내 포털의 일반회원으로 등록되었습니다.<br />
+              생성된 계정으로 로그인해 주세요.
+            </p>
+
+            <div className="success-user-summary-box">
+              <div className="summary-row">
+                <span className="summary-label">성명</span>
+                <span className="summary-val">{completedUserData?.fullName}</span>
+              </div>
+              <div className="summary-row">
+                <span className="summary-label">가입 아이디</span>
+                <span className="summary-val">{completedUserData?.username}</span>
+              </div>
+              <div className="summary-row">
+                <span className="summary-label">회원 등급</span>
+                <span className="summary-val" style={{ color: 'var(--accent-color)' }}>
+                  🌱 준회원 (일반회원)
+                </span>
+              </div>
+            </div>
+
+            <button type="button" className="btn-go-login" onClick={handleProceedToLogin}>
+              로그인 화면으로 이동
+            </button>
           </div>
         </div>
       )}

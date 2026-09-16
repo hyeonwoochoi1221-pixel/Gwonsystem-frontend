@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+// src/pages/auth/LoginPage.tsx
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import Logo from '../../assets/logo.svg?react';
 import { loginMember } from '../../api/authService';
@@ -16,12 +17,28 @@ interface LoginResponse {
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const [username, setUsername] = useState('');
+  const location = useLocation();
+
+  // 🌟 회원가입 성공 모달에서 전달된 아이디가 있다면 기본값으로 자동 채움
+  const registeredUsername = (location.state as any)?.registeredUsername || '';
+
+  const [username, setUsername] = useState(registeredUsername);
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLoginSubmit = async (e: React.FormEvent) => {
+  // 자동 포커싱을 위한 비밀번호 input ref
+  const passwordInputRef = useRef<HTMLInputElement>(null);
+
+  // 회원가입 직후 넘어온 경우 비밀번호 입력란으로 바로 커서 이동
+  useEffect(() => {
+    if (registeredUsername && passwordInputRef.current) {
+      passwordInputRef.current.focus();
+    }
+  }, [registeredUsername]);
+
+  // 🌟 TS6385 해결: React.SyntheticEvent<HTMLFormElement> 적용
+  const handleLoginSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMessage(null);
     setIsLoading(true);
@@ -113,6 +130,7 @@ export default function LoginPage() {
               <a href="#forgot" className="forgot-link">비밀번호 찾기</a>
             </div>
             <input
+              ref={passwordInputRef}
               id="login-password"
               type="password"
               placeholder="비밀번호 입력"
