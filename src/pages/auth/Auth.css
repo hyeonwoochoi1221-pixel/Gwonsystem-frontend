@@ -40,6 +40,10 @@
   max-width: 680px;
 }
 
+.find-card {
+  max-width: 500px;
+}
+
 /* 상단 로고 & 타이틀 영역 */
 .auth-header {
   text-align: center;
@@ -618,6 +622,37 @@ body.light .input-readonly {
 .input-invalid {
   border-color: #ef4444 !important;
   background-color: rgba(239, 68, 68, 0.05) !important;
+}
+
+/* ==========================================================================
+   🔍 계정 찾기(Find Account) 탭 스타일
+   ========================================================================== */
+.find-tab-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  background-color: var(--bg-hover);
+  padding: 4px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.find-tab-btn {
+  padding: 10px 0;
+  border: none;
+  background: transparent;
+  color: var(--text-sub);
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.find-tab-btn.active {
+  background-color: var(--bg-card);
+  color: var(--accent-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* ==========================================================================

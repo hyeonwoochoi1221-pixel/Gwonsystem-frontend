@@ -10,6 +10,7 @@ import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import OAuthCallback from './pages/auth/OAuthCallback';
 import ProfilePage from './pages/profile/ProfilePage'; // 🌟 회원 정보수정 및 정회원 신청 페이지
+import FindAccountPage from './pages/auth/FindAccountPage'; // 🌟 아이디/비밀번호 찾기 페이지
 
 // 🛡️ 슈퍼바이저 관리자 레이아웃 및 하위 뷰
 import SupervisorAdminPage from './pages/admin/SupervisorAdminPage';
@@ -29,18 +30,23 @@ import './App.css';
 export default function App() {
   return (
     <Router>
+      {/* 🌟 헤더에 가려지지 않도록 top 여백 및 zIndex 최상위 격상 */}
       <Toaster
         position="top-right"
         reverseOrder={false}
+        containerStyle={{
+          top: 85,          // 상단 고정 헤더 높이를 피해 바로 아래로 노출
+          zIndex: 99999,    // 헤더 및 모달 레이어보다 무조건 위에 뜨도록 보장
+        }}
         toastOptions={{
-          duration: 2500,
+          duration: 3500,
           style: {
             background: 'var(--bg-card, #1c1c24)',
             color: 'var(--text-main, #f1f5f9)',
             border: '1px solid var(--border-color, #2e2e38)',
             fontSize: '13px',
             fontWeight: '600',
-            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)',
+            boxShadow: '0 12px 30px rgba(0, 0, 0, 0.35)',
             borderRadius: '8px',
             padding: '12px 18px',
           },
@@ -68,6 +74,9 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/oauth/callback" element={<OAuthCallback />} />
+
+          {/* 🌟 계정 찾기 라우트 */}
+          <Route path="/find-account" element={<FindAccountPage />} />
 
           {/* 🌟 2. 회원정보 수정 & 정회원 승격 신청 라우트 */}
           <Route path="/profile" element={<ProfilePage />} />

@@ -83,7 +83,6 @@ export default function RegisterPage() {
   });
 
   const [passwordConfirm, setPasswordConfirm] = useState('');
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
 
@@ -97,7 +96,6 @@ export default function RegisterPage() {
   const [isEmailCodeSent, setIsEmailCodeSent] = useState(false);
   const [inputEmailCode, setInputEmailCode] = useState('');
   const [isEmailVerifying, setIsEmailVerifying] = useState(false);
-  // 소셜 로그인 진입 시 이미 인증된 이메일로 간주
   const [isEmailVerified, setIsEmailVerified] = useState(Boolean(socialEmail));
   const [emailTimer, setEmailTimer] = useState(180); // 3분(180초)
 
@@ -117,7 +115,7 @@ export default function RegisterPage() {
     }
   }, [socialProvider]);
 
-  // 3분 카운트다운 타이머 처리
+  // 3분 카운트다운 타이머
   useEffect(() => {
     let interval: any = null;
     if (isEmailCodeSent && !isEmailVerified && emailTimer > 0) {
@@ -181,7 +179,6 @@ export default function RegisterPage() {
         toast.success('사용 가능한 아이디입니다.');
       }
     } catch (err: any) {
-      console.error('아이디 중복 확인 오류:', err);
       const msg = err.response?.data?.message || '아이디 중복 검사에 실패했습니다.';
       setFieldErrors((prev) => ({ ...prev, username: msg }));
       toast.error(msg);
@@ -204,17 +201,15 @@ export default function RegisterPage() {
     }
 
     setIsEmailSending(true);
-    setErrorMsg(null);
 
     try {
       await sendEmailVerificationCode(email);
       setIsEmailCodeSent(true);
-      setEmailTimer(180); // 3분 리셋
+      setEmailTimer(180);
       setFieldErrors((prev) => ({ ...prev, email: '' }));
       toast.success('입력하신 메일로 6자리 인증번호가 발송되었습니다.');
       setTimeout(() => emailCodeRef.current?.focus(), 150);
     } catch (err: any) {
-      console.error('인증메일 발송 실패:', err);
       const msg = err.response?.data?.message || '인증번호 발송에 실패했습니다. 메일 주소를 확인해 주세요.';
       setFieldErrors((prev) => ({ ...prev, email: msg }));
       toast.error(msg);
@@ -247,7 +242,6 @@ export default function RegisterPage() {
         toast.success('이메일 인증이 완료되었습니다.');
       }
     } catch (err: any) {
-      console.error('인증번호 검증 실패:', err);
       const msg = err.response?.data?.message || '인증번호가 일치하지 않습니다.';
       toast.error(msg);
     } finally {
@@ -339,7 +333,6 @@ export default function RegisterPage() {
         msg = '올바른 이메일 주소 형식(@, 도메인 포함)이 아닙니다.';
       }
       setFieldErrors((prev) => ({ ...prev, email: msg }));
-      // 이메일 변경 시 인증 상태 초기화
       if (!socialEmail) {
         setIsEmailVerified(false);
         setIsEmailCodeSent(false);
@@ -396,85 +389,64 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setErrorMsg(null);
 
     if (formData.username.length < 4) {
-      const msg = '아이디를 4자리 이상 입력해 주세요.';
-      setErrorMsg(msg);
-      toast.error(msg);
+      toast.error('아이디를 4자리 이상 입력해 주세요.');
       scrollToErrorField(usernameRef);
       return;
     }
 
     if (!isUsernameChecked) {
-      const msg = '아이디 중복 확인을 먼저 진행해 주세요.';
-      setErrorMsg(msg);
-      toast.error(msg);
+      toast.error('아이디 중복 확인을 먼저 진행해 주세요.');
       scrollToErrorField(usernameRef);
       return;
     }
 
     if (!isEmailVerified) {
-      const msg = '이메일 인증을 완료해야 회원가입이 가능합니다.';
-      setErrorMsg(msg);
-      toast.error(msg);
+      toast.error('이메일 인증을 완료해야 회원가입이 가능합니다.');
       scrollToErrorField(emailRef);
       return;
     }
 
     if (formData.password.length < 8) {
-      const msg = '비밀번호는 8자 이상 입력해야 합니다.';
-      setErrorMsg(msg);
-      toast.error(msg);
+      toast.error('비밀번호는 8자 이상 입력해야 합니다.');
       scrollToErrorField(passwordRef);
       return;
     }
 
     if (formData.password !== passwordConfirm) {
-      const msg = '비밀번호와 비밀번호 확인이 일치하지 않습니다.';
-      setErrorMsg(msg);
-      toast.error(msg);
+      toast.error('비밀번호와 비밀번호 확인이 일치하지 않습니다.');
       scrollToErrorField(passwordConfirmRef);
       return;
     }
 
     if (!formData.lastName.trim()) {
-      const msg = '성을 입력해 주세요.';
-      setErrorMsg(msg);
-      toast.error(msg);
+      toast.error('성을 입력해 주세요.');
       scrollToErrorField(lastNameRef);
       return;
     }
 
     if (!formData.firstName.trim()) {
-      const msg = '이름을 입력해 주세요.';
-      setErrorMsg(msg);
-      toast.error(msg);
+      toast.error('이름을 입력해 주세요.');
       scrollToErrorField(firstNameRef);
       return;
     }
 
     const phoneRegex = /^01[016789]-\d{3,4}-\d{4}$/;
     if (!phoneRegex.test(formData.phone)) {
-      const msg = '휴대폰 번호 형식을 완성해 주세요 (010-XXXX-XXXX).';
-      setErrorMsg(msg);
-      toast.error(msg);
+      toast.error('휴대폰 번호 형식을 완성해 주세요 (010-XXXX-XXXX).');
       scrollToErrorField(phoneRef);
       return;
     }
 
     if (!formData.zipcode || !formData.address) {
-      const msg = '우편번호 검색을 통해 기본 주소를 입력해 주세요.';
-      setErrorMsg(msg);
-      toast.error(msg);
+      toast.error('우편번호 검색을 통해 기본 주소를 입력해 주세요.');
       setIsPostcodeOpen(true);
       return;
     }
 
     if (!formData.termsAgreed || !formData.privacyAgreed) {
-      const msg = '필수 약관(서비스 이용약관 및 개인정보 수집/이용)에 반드시 동의해야 합니다.';
-      setErrorMsg(msg);
-      toast.error(msg);
+      toast.error('필수 약관(서비스 이용약관 및 개인정보 수집/이용)에 반드시 동의해야 합니다.');
       scrollToErrorField(termsGroupRef);
       return;
     }
@@ -490,14 +462,11 @@ export default function RegisterPage() {
       });
       setIsSuccessModalOpen(true);
     } catch (err: any) {
-      console.error('회원가입 실패:', err);
-
       const backendMessage =
         err.response?.data?.message ||
         (typeof err.response?.data === 'string' ? err.response.data : null) ||
         '회원가입 처리 중 오류가 발생했습니다.';
 
-      setErrorMsg(backendMessage);
       toast.error(backendMessage);
 
       if (backendMessage.includes('이메일') || backendMessage.toLowerCase().includes('email')) {
@@ -537,23 +506,15 @@ export default function RegisterPage() {
         <div className="auth-header">
           <Link to="/" className="auth-logo-link">
             <Logo className="auth-logo-svg" />
-            <span className="auth-logo-text">GWON SYSTEM</span>
+            <span className="auth-logo-text">G-WON SYSTEM</span>
           </Link>
-          <h2>신규 회원가입</h2>
+          <h2>회원가입</h2>
           <p>
             {socialProvider
               ? `${socialProvider} 계정과 연동될 포털 아이디 및 계정을 생성합니다.`
               : '기본 인적사항 및 직장 정보를 입력해 계정을 생성합니다.'}
           </p>
         </div>
-
-        {socialProvider && (
-          <div className="auth-success-alert">
-            🔗 <strong>{socialProvider}</strong> 계정 인증 완료! 사용할 아이디와 기본 정보를 설정하면 가입 즉시 연동됩니다.
-          </div>
-        )}
-
-        {errorMsg && <div className="auth-error-alert">{errorMsg}</div>}
 
         <form className="auth-form" onSubmit={handleSubmit}>
           {/* 1. 계정 정보 */}

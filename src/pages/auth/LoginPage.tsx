@@ -37,7 +37,7 @@ export default function LoginPage() {
     }
   }, [registeredUsername]);
 
-  // 🌟 TS6385 해결: React.SyntheticEvent<HTMLFormElement> 적용
+  // TS6385 해결: React.SyntheticEvent<HTMLFormElement> 적용
   const handleLoginSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMessage(null);
@@ -100,10 +100,9 @@ export default function LoginPage() {
         <div className="auth-header">
           <Link to="/" className="auth-logo-link">
             <Logo className="auth-logo-svg" />
-            <span className="auth-logo-text">GWON SYSTEM</span>
+            <span className="auth-logo-text">G-WON SYSTEM</span>
           </Link>
-          <h2>사내 포털 로그인</h2>
-          <p>등록된 아이디와 비밀번호를 입력해주세요.</p>
+          <h2>로그인</h2>
         </div>
 
         {/* 에러 메시지 알림 바 */}
@@ -127,7 +126,8 @@ export default function LoginPage() {
           <div className="form-group">
             <div className="label-row">
               <label htmlFor="login-password">비밀번호</label>
-              <a href="#forgot" className="forgot-link">비밀번호 찾기</a>
+              {/* 🌟 아이디/비밀번호 찾기 페이지 링크 연결 */}
+              <Link to="/find-account" className="forgot-link">아이디/비밀번호 찾기</Link>
             </div>
             <input
               ref={passwordInputRef}
@@ -191,7 +191,7 @@ export default function LoginPage() {
 
         {/* 회원가입 전환 */}
         <div className="auth-footer-nav">
-          아직 계정이 없으신가요? <Link to="/register">일반회원 가입</Link>
+          아직 계정이 없으신가요? <Link to="/register">회원가입</Link>
         </div>
       </div>
     </div>
