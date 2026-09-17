@@ -1,43 +1,165 @@
-// src/pages/profile/ProfilePage.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DaumPostcodeEmbed from 'react-daum-postcode';
 import toast from 'react-hot-toast';
-import './ProfilePage.css';
+import {
+  verifyCurrentPassword,
+  getMemberProfile,
+  updateMemberProfile,
+} from '../../api/authService';
+import '../auth/Auth.css';
+
+// 전화번호 자동 포맷팅 (010-XXXX-XXXX)
+const formatPhoneNumber = (value: string): string => {
+  const digits = value.replace(/\D/g, '');
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+  return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7, 11)}`;
+};
+
+// 유선전화 자동 포맷팅
+const formatWorkplacePhone = (value: string): string => {
+  const digits = value.replace(/\D/g, '');
+  if (digits.startsWith('02')) {
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 5) return `${digits.slice(0, 2)}-${digits.slice(2)}`;
+    if (digits.length <= 9) return `${digits.slice(0, 2)}-${digits.slice(2, 5)}-${digits.slice(5, 9)}`;
+    return `${digits.slice(0, 2)}-${digits.slice(2, 6)}-${digits.slice(6, 10)}`;
+  } else {
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 6) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+    if (digits.length <= 10) return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
+    return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7, 11)}`;
+  }
+};
 
 export default function ProfilePage() {
+  const navigate = useNavigate();
+  const currentUsername = localStorage.getItem('username') || '';
+
+  // 1단계: 비밀번호 본인 확인 게이트 상태
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [authPassword, setAuthPassword] = useState<string>('');
+  const [isVerifying, setIsVerifying] = useState<boolean>(false);
+
+  // 2단계: 회원가입 화면과 1:1 동일한 구조의 폼 상태
   const [formData, setFormData] = useState({
-    username: localStorage.getItem('username') || 'hwchoi1221',
-    lastName: localStorage.getItem('lastName') || '최',
-    firstName: localStorage.getItem('firstName') || '현우',
-    gender: '남',
-    birthYear: '2000',
-    birthMonth: '12',
-    birthDay: '21',
-    phonePrefix: '010',
-    phoneMid: '3034',
-    phoneEnd: '1924',
-    email: 'hwchoi1221@naver.com',
-    zipcode: '06561',
-    address: '서울특별시 서초구 방배로37길 39',
-    detailAddress: '401호',
-    workplaceName: 'G-WON SYSTEM',
-    departmentName: 'AI 연구개발실',
-    position: '연구원',
-    workplacePhone: '02-598-1924',
-    role: localStorage.getItem('userRole') || 'ROLE_ASSOCIATE',
-    newPassword: '',
-    newPasswordConfirm: '',
-    // 정회원 승격 신청
-    targetDepartment: 'AI 연구개발실',
-    targetPosition: '연구전담요원',
-    targetProject: '반도체 공급망 시세 수집 및 이상치 탐지 AI',
-    promotionReason: '',
+    username: currentUsername,
+    email: '',
+    lastName: '',
+    firstName: '',
+    phone: '',
+    zipcode: '',
+    address: '',
+    detailAddress: '',
+    gender: '',
+    birthDate: '',
+    workplaceName: '',
+    departmentName: '',
+    position: '',
+    workplacePhone: '',
+    role: 'ROLE_ASSOCIATE',
   });
 
-  const [isPromotionModalOpen, setIsPromotionModalOpen] = useState(false);
-  const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
+  // 비밀번호 변경 필드 (선택 사항)
+  const [newPassword, setNewPassword] = useState('');
+  const [newPasswordConfirm, setNewPasswordConfirm] = useState('');
 
-  // 카카오 우편번호 선택 완료 콜백 (타입 충돌 및 Deprecated 해결)
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isPostcodeOpen, setIsPostcodeOpen] = useState<boolean>(false);
+  const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
+
+  const passwordRef = useRef<HTMLInputElement>(null);
+  const passwordConfirmRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!currentUsername) {
+      toast.error('로그인이 필요한 페이지입니다.');
+      navigate('/login');
+    }
+  }, [currentUsername, navigate]);
+
+  // 1단계: 현재 비밀번호 검증 핸들러
+  const handleVerifyPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!authPassword) {
+      toast.error('현재 비밀번호를 입력해 주세요.');
+      return;
+    }
+
+    setIsVerifying(true);
+    try {
+      await verifyCurrentPassword(currentUsername, authPassword);
+      toast.success('본인 확인이 완료되었습니다.');
+
+      // 기존 회원 상세 정보 로드
+      const data = await getMemberProfile(currentUsername);
+      setFormData({
+        username: data.username || currentUsername,
+        email: data.email || '',
+        lastName: data.lastName || '',
+        firstName: data.firstName || '',
+        phone: data.phone || '',
+        zipcode: data.zipcode || '',
+        address: data.address || '',
+        detailAddress: data.detailAddress || '',
+        gender: data.gender || '',
+        birthDate: data.birthDate || '',
+        workplaceName: data.workplaceName || '',
+        departmentName: data.departmentName || '',
+        position: data.position || '',
+        workplacePhone: data.workplacePhone || '',
+        role: data.role || 'ROLE_ASSOCIATE',
+      });
+      setIsAuthenticated(true);
+    } catch (err: any) {
+      const msg = err.response?.data?.message || '비밀번호가 일치하지 않습니다.';
+      toast.error(msg);
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  // 인풋 값 변경 핸들러
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+
+    if (name === 'phone') {
+      const formatted = formatPhoneNumber(value);
+      setFormData((prev) => ({ ...prev, phone: formatted }));
+      return;
+    }
+
+    if (name === 'workplacePhone') {
+      const formatted = formatWorkplacePhone(value);
+      setFormData((prev) => ({ ...prev, workplacePhone: formatted }));
+      return;
+    }
+
+    if (name === 'newPassword') {
+      setNewPassword(value);
+      const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+      let msg = '';
+      if (value.length > 0 && !passwordRegex.test(value)) {
+        msg = '영문, 숫자, 특수문자(@$!%*#?&) 조합 8자 이상이어야 합니다.';
+      }
+      setFieldErrors((prev) => ({ ...prev, newPassword: msg }));
+      return;
+    }
+
+    if (name === 'newPasswordConfirm') {
+      setNewPasswordConfirm(value);
+      setFieldErrors((prev) => ({
+        ...prev,
+        newPasswordConfirm: value && newPassword !== value ? '비밀번호가 일치하지 않습니다.' : '',
+      }));
+      return;
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // 카카오 우편번호 선택 핸들러
   const handleCompletePostcode = (data: any) => {
     let fullAddress = data.address;
     let extraAddress = '';
@@ -58,357 +180,411 @@ export default function ProfilePage() {
     setIsPostcodeOpen(false);
   };
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
+  // 2단계: 최종 수정 저장 핸들러
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.newPassword) {
-      if (formData.newPassword !== formData.newPasswordConfirm) {
-        toast.error('새 비밀번호가 일치하지 않습니다.');
+
+    if (newPassword) {
+      const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+      if (!passwordRegex.test(newPassword)) {
+        toast.error('새 비밀번호는 8자 이상 영문, 숫자, 특수문자 조합이어야 합니다.');
+        passwordRef.current?.focus();
         return;
       }
-      if (formData.newPassword.length < 8) {
-        toast.error('비밀번호는 8자 이상이어야 합니다.');
+      if (newPassword !== newPasswordConfirm) {
+        toast.error('새 비밀번호와 비밀번호 확인이 일치하지 않습니다.');
+        passwordConfirmRef.current?.focus();
         return;
       }
     }
-    localStorage.setItem('lastName', formData.lastName);
-    localStorage.setItem('firstName', formData.firstName);
-    toast.success('개인정보가 성공적으로 수정되었습니다.');
-  };
 
-  const handlePromotionSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!formData.promotionReason.trim()) {
-      toast.error('신청 사유를 입력해주세요.');
+    if (!formData.lastName.trim() || !formData.firstName.trim()) {
+      toast.error('성명을 올바르게 입력해 주세요.');
       return;
     }
-    toast.success('기업부설연구소 정회원 승격 신청서가 제출되었습니다.');
-    setIsPromotionModalOpen(false);
+
+    setIsLoading(true);
+    try {
+      const payload: any = {
+        ...formData,
+        password: newPassword ? newPassword : null,
+      };
+
+      const res = await updateMemberProfile(currentUsername, payload);
+
+      localStorage.setItem('lastName', res.lastName || formData.lastName);
+      localStorage.setItem('firstName', res.firstName || formData.firstName);
+
+      toast.success(res.message || '개인정보가 성공적으로 수정되었습니다.');
+      setNewPassword('');
+      setNewPasswordConfirm('');
+    } catch (err: any) {
+      const msg = err.response?.data?.message || '개인정보 수정 처리에 실패했습니다.';
+      toast.error(msg);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="wide-profile-container">
-      <div className="wide-profile-card">
-        {/* 상단 헤더 */}
-        <div className="wide-header-row">
-          <div>
-            <h2>개인정보수정</h2>
-            <p>가입 시 등록된 회원 기본 정보 및 사내 소속 정보를 조회하고 수정합니다.</p>
+    <div className="auth-page-container" style={{ padding: '40px 16px 80px' }}>
+      {/* 🌟 1단계: 비밀번호 본인 확인 게이트 */}
+      {!isAuthenticated ? (
+        <div className="auth-card" style={{ maxWidth: '440px', margin: '60px auto' }}>
+          <div className="auth-header">
+            <span style={{ fontSize: '36px', display: 'block', marginBottom: '10px' }}>🔒</span>
+            <h2>회원정보 보호 확인</h2>
+            <p>개인정보를 안전하게 보호하기 위해 현재 비밀번호를 입력해 주세요.</p>
           </div>
-          <div className="wide-header-actions">
-            {formData.role === 'ROLE_ASSOCIATE' && (
+
+          <form className="auth-form" onSubmit={handleVerifyPassword}>
+            <div className="form-group">
+              <label htmlFor="auth-pwd">현재 비밀번호</label>
+              <input
+                id="auth-pwd"
+                type="password"
+                placeholder="현재 비밀번호를 입력하세요"
+                value={authPassword}
+                onChange={(e) => setAuthPassword(e.target.value)}
+                autoFocus
+                required
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
               <button
                 type="button"
-                className="btn-open-promotion-wide"
-                onClick={() => setIsPromotionModalOpen(true)}
+                className="btn-id-check"
+                style={{ flex: 1, backgroundColor: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-sub)' }}
+                onClick={() => navigate(-1)}
               >
-                🏢 연구소 정회원 승격 신청
+                취소
               </button>
-            )}
-            <span className="req-guide-tag">■ 표시는 필수 입력 항목입니다.</span>
-          </div>
+              <button
+                type="submit"
+                className="btn-auth-submit"
+                style={{ flex: 2, margin: 0 }}
+                disabled={isVerifying}
+              >
+                {isVerifying ? '확인 중...' : '본인 확인'}
+              </button>
+            </div>
+          </form>
         </div>
+      ) : (
+        /* 🌟 2단계: 회원가입 페이지와 완벽히 동일한 카드 레이아웃 */
+        <div className="auth-card register-card">
+          <div className="auth-header">
+            <h2>개인정보 수정</h2>
+            <p>가입 시 등록된 기본 인적사항 및 직장 정보를 최신 상태로 수정합니다.</p>
+          </div>
 
-        <form onSubmit={handleSubmit} className="wide-profile-form">
-          <table className="wide-grid-table">
-            <colgroup>
-              <col style={{ width: '160px' }} />
-              <col style={{ width: '42%' }} />
-              <col style={{ width: '160px' }} />
-              <col style={{ width: '42%' }} />
-            </colgroup>
-            <tbody>
-            {/* 1. 아이디 & 회원 등급 */}
-            <tr>
-              <th><span className="dot">■</span> 아이디</th>
-              <td>
-                <div className="align-row">
-                  <input
-                    type="text"
-                    value={formData.username}
-                    readOnly
-                    className="wide-input readonly w-220"
-                  />
-                  <span className="badge-verified">인증 완료 계정</span>
-                </div>
-              </td>
-              <th>회원 등급</th>
-              <td>
-                  <span className={`wide-role-badge ${formData.role.toLowerCase()}`}>
-                    {formData.role === 'ROLE_SUPERVISOR' && '👑 관리자 (Supervisor)'}
-                    {formData.role === 'ROLE_REGULAR' && '👔 정회원 (임직원/연구원)'}
-                    {formData.role === 'ROLE_ASSOCIATE' && '🌱 일반회원 (준회원)'}
-                  </span>
-              </td>
-            </tr>
+          <form className="auth-form" onSubmit={handleSubmit}>
+            {/* 1. 계정 정보 */}
+            <div className="form-section-title">계정 정보 (아이디/이메일은 변경 불가)</div>
 
-            {/* 2. 성명 (한글 성/이름 분리) */}
-            <tr>
-              <th><span className="dot">■</span> 성명 (한글)</th>
-              <td colSpan={3}>
-                <div className="align-row">
-                  <span className="label-sub">성:</span>
-                  <input
-                    type="text"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleInputChange}
-                    className="wide-input w-100"
-                    required
-                  />
-                  <span className="label-sub" style={{ marginLeft: '12px' }}>이름:</span>
-                  <input
-                    type="text"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                    className="wide-input w-160"
-                    required
-                  />
-                </div>
-              </td>
-            </tr>
+            <div className="form-group">
+              <label>아이디</label>
+              <input
+                type="text"
+                value={formData.username}
+                readOnly
+                className="input-readonly"
+              />
+            </div>
 
-            {/* 3. 생년월일 & 성별 */}
-            <tr>
-              <th><span className="dot">■</span> 생년월일</th>
-              <td>
-                <div className="align-row">
-                  <select name="birthYear" value={formData.birthYear} onChange={handleInputChange} className="wide-select w-100">
-                    <option value="2000">2000년</option>
-                    <option value="1999">1999년</option>
-                    <option value="1998">1998년</option>
-                  </select>
-                  <select name="birthMonth" value={formData.birthMonth} onChange={handleInputChange} className="wide-select w-80">
-                    <option value="12">12월</option>
-                    <option value="11">11월</option>
-                    <option value="10">10월</option>
-                  </select>
-                  <select name="birthDay" value={formData.birthDay} onChange={handleInputChange} className="wide-select w-80">
-                    <option value="21">21일</option>
-                    <option value="20">20일</option>
-                    <option value="19">19일</option>
-                  </select>
-                </div>
-              </td>
-              <th><span className="dot">■</span> 성별</th>
-              <td>
-                <div className="align-row">
-                  <label className="wide-radio">
-                    <input
-                      type="radio"
-                      name="gender"
-                      value="남"
-                      checked={formData.gender === '남'}
-                      onChange={handleInputChange}
-                    />
-                    <span>남자</span>
-                  </label>
-                  <label className="wide-radio" style={{ marginLeft: '16px' }}>
-                    <input
-                      type="radio"
-                      name="gender"
-                      value="여"
-                      checked={formData.gender === '여'}
-                      onChange={handleInputChange}
-                    />
-                    <span>여자</span>
-                  </label>
-                </div>
-              </td>
-            </tr>
-
-            {/* 4. 휴대폰 번호 */}
-            <tr>
-              <th><span className="dot">■</span> 휴대폰 번호</th>
-              <td colSpan={3}>
-                <div className="align-row">
-                  <select
-                    name="phonePrefix"
-                    value={formData.phonePrefix}
-                    onChange={handleInputChange}
-                    className="wide-select w-90"
-                  >
-                    <option value="010">010</option>
-                    <option value="011">011</option>
-                  </select>
-                  <span>-</span>
-                  <input
-                    type="text"
-                    name="phoneMid"
-                    value={formData.phoneMid}
-                    onChange={handleInputChange}
-                    className="wide-input w-90"
-                    maxLength={4}
-                    required
-                  />
-                  <span>-</span>
-                  <input
-                    type="text"
-                    name="phoneEnd"
-                    value={formData.phoneEnd}
-                    onChange={handleInputChange}
-                    className="wide-input w-90"
-                    maxLength={4}
-                    required
-                  />
-                </div>
-              </td>
-            </tr>
-
-            {/* 5. 이메일 */}
-            <tr>
-              <th><span className="dot">■</span> 이메일</th>
-              <td colSpan={3}>
+            <div className="form-group">
+              <label>이메일 주소</label>
+              <div className="email-input-row">
                 <input
                   type="email"
-                  name="email"
                   value={formData.email}
+                  readOnly
+                  className="input-readonly"
+                />
+                <button type="button" className="btn-email-action" disabled style={{ opacity: 0.8 }}>
+                  인증 완료
+                </button>
+              </div>
+            </div>
+
+            {/* 비밀번호 변경 (선택) */}
+            <div className="form-section-title">비밀번호 변경 (변경을 원하실 때만 입력하세요)</div>
+
+            <div className="form-grid-2">
+              <div className="form-group">
+                <label htmlFor="new-password">새 비밀번호</label>
+                <input
+                  ref={passwordRef}
+                  id="new-password"
+                  name="newPassword"
+                  type="password"
+                  placeholder="8자 이상 영문, 숫자, 특수문자 조합"
+                  value={newPassword}
                   onChange={handleInputChange}
-                  className="wide-input w-full-mid"
+                  className={fieldErrors.newPassword ? 'input-invalid' : ''}
+                  disabled={isLoading}
+                />
+                {fieldErrors.newPassword && (
+                  <span className="field-error-msg">⚠️ {fieldErrors.newPassword}</span>
+                )}
+              </div>
+              <div className="form-group">
+                <label htmlFor="new-passwordConfirm">새 비밀번호 확인</label>
+                <input
+                  ref={passwordConfirmRef}
+                  id="new-passwordConfirm"
+                  name="newPasswordConfirm"
+                  type="password"
+                  placeholder="새 비밀번호 재입력"
+                  value={newPasswordConfirm}
+                  onChange={handleInputChange}
+                  className={fieldErrors.newPasswordConfirm ? 'input-invalid' : ''}
+                  disabled={isLoading}
+                />
+                {fieldErrors.newPasswordConfirm && (
+                  <span className="field-error-msg">⚠️ {fieldErrors.newPasswordConfirm}</span>
+                )}
+              </div>
+            </div>
+
+            {/* 2. 기본 인적사항 */}
+            <div className="form-section-title">기본 인적사항</div>
+
+            <div className="form-grid-2">
+              <div className="form-group">
+                <label htmlFor="prof-lastName">
+                  성 <span className="req">*</span>
+                </label>
+                <input
+                  id="prof-lastName"
+                  name="lastName"
+                  type="text"
+                  placeholder="예: 홍"
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+                  maxLength={10}
+                  disabled={isLoading}
                   required
                 />
-              </td>
-            </tr>
-
-            {/* 6. 주소 (카카오 우편번호 모달 연동) */}
-            <tr>
-              <th><span className="dot">■</span> 주소</th>
-              <td colSpan={3}>
-                <div className="address-stack">
-                  <div className="align-row">
-                    <input
-                      type="text"
-                      value={formData.zipcode}
-                      readOnly
-                      placeholder="우편번호"
-                      className="wide-input readonly w-120"
-                    />
-                    <button
-                      type="button"
-                      className="btn-kakao-search"
-                      onClick={() => setIsPostcodeOpen(true)}
-                    >
-                      우편번호 검색 (카카오)
-                    </button>
-                  </div>
-                  <input
-                    type="text"
-                    value={formData.address}
-                    readOnly
-                    placeholder="기본 도로명 주소"
-                    className="wide-input readonly w-full"
-                  />
-                  <input
-                    type="text"
-                    name="detailAddress"
-                    value={formData.detailAddress}
-                    onChange={handleInputChange}
-                    placeholder="상세 주소를 입력해주세요 (동·호수 등)"
-                    className="wide-input w-full"
-                  />
-                </div>
-              </td>
-            </tr>
-
-            {/* 7. 소속 정보 (2열 정렬) */}
-            <tr>
-              <th>근무처 소속명</th>
-              <td>
+              </div>
+              <div className="form-group">
+                <label htmlFor="prof-firstName">
+                  이름 <span className="req">*</span>
+                </label>
                 <input
+                  id="prof-firstName"
+                  name="firstName"
                   type="text"
+                  placeholder="예: 길동"
+                  value={formData.firstName}
+                  onChange={handleInputChange}
+                  maxLength={30}
+                  disabled={isLoading}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="form-grid-2">
+              <div className="form-group">
+                <label htmlFor="prof-phone">
+                  휴대폰 번호 <span className="req">*</span>
+                </label>
+                <input
+                  id="prof-phone"
+                  name="phone"
+                  type="tel"
+                  placeholder="010-0000-0000"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  maxLength={13}
+                  disabled={isLoading}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="prof-gender">성별</label>
+                <select
+                  id="prof-gender"
+                  name="gender"
+                  value={formData.gender}
+                  onChange={handleInputChange}
+                  className="auth-select"
+                  disabled={isLoading}
+                >
+                  <option value="">선택 안 함</option>
+                  <option value="MALE">남성</option>
+                  <option value="FEMALE">여성</option>
+                  <option value="OTHER">기타</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="prof-birthDate">생년월일</label>
+              <input
+                id="prof-birthDate"
+                name="birthDate"
+                type="date"
+                className="input-date-picker"
+                value={formData.birthDate}
+                onChange={handleInputChange}
+                max="2099-12-31"
+                disabled={isLoading}
+              />
+            </div>
+
+            {/* 3. 주소 정보 */}
+            <div className="form-section-title">주소 정보</div>
+
+            <div className="form-group">
+              <label htmlFor="prof-zipcode">
+                우편번호 <span className="req">*</span>
+              </label>
+              <div className="postcode-search-row">
+                <input
+                  id="prof-zipcode"
+                  name="zipcode"
+                  type="text"
+                  placeholder="우편번호 검색"
+                  value={formData.zipcode}
+                  readOnly
+                  className="input-readonly"
+                  required
+                />
+                <button
+                  type="button"
+                  className="btn-address-search"
+                  onClick={() => setIsPostcodeOpen(true)}
+                  disabled={isLoading}
+                >
+                  우편번호 검색
+                </button>
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="prof-address">
+                기본 주소 <span className="req">*</span>
+              </label>
+              <input
+                id="prof-address"
+                name="address"
+                type="text"
+                value={formData.address}
+                readOnly
+                className="input-readonly"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="prof-detailAddress">상세주소</label>
+              <input
+                id="prof-detailAddress"
+                name="detailAddress"
+                type="text"
+                placeholder="동/호수, 건물명 등"
+                value={formData.detailAddress}
+                onChange={handleInputChange}
+                maxLength={100}
+                disabled={isLoading}
+              />
+            </div>
+
+            {/* 4. 근무처 소속 정보 (선택) */}
+            <div className="form-section-title">근무처 / 소속 정보 (선택)</div>
+
+            <div className="form-grid-2">
+              <div className="form-group">
+                <label htmlFor="prof-workplaceName">근무처 소속명</label>
+                <input
+                  id="prof-workplaceName"
                   name="workplaceName"
+                  type="text"
+                  placeholder="회사명 또는 대학교명"
                   value={formData.workplaceName}
                   onChange={handleInputChange}
-                  className="wide-input w-full"
-                  placeholder="예: G-WON SYSTEM"
+                  maxLength={50}
+                  disabled={isLoading}
                 />
-              </td>
-              <th>부서명 / 학과명</th>
-              <td>
+              </div>
+              <div className="form-group">
+                <label htmlFor="prof-departmentName">근무처 부서명 / 학과명</label>
                 <input
-                  type="text"
+                  id="prof-departmentName"
                   name="departmentName"
+                  type="text"
+                  placeholder="부서 또는 학과"
                   value={formData.departmentName}
                   onChange={handleInputChange}
-                  className="wide-input w-full"
-                  placeholder="예: AI 연구개발실"
+                  maxLength={50}
+                  disabled={isLoading}
                 />
-              </td>
-            </tr>
+              </div>
+            </div>
 
-            <tr>
-              <th>직위 (직급)</th>
-              <td>
+            <div className="form-grid-2">
+              <div className="form-group">
+                <label htmlFor="prof-position">직위</label>
                 <input
-                  type="text"
+                  id="prof-position"
                   name="position"
+                  type="text"
+                  placeholder="선임연구원, 팀장 등"
                   value={formData.position}
                   onChange={handleInputChange}
-                  className="wide-input w-full"
-                  placeholder="예: 연구원"
+                  maxLength={30}
+                  disabled={isLoading}
                 />
-              </td>
-              <th>근무처 전화번호</th>
-              <td>
+              </div>
+              <div className="form-group">
+                <label htmlFor="prof-workplacePhone">근무처 유선전화</label>
                 <input
-                  type="text"
+                  id="prof-workplacePhone"
                   name="workplacePhone"
+                  type="tel"
+                  placeholder="02-000-0000"
                   value={formData.workplacePhone}
                   onChange={handleInputChange}
-                  className="wide-input w-full"
-                  placeholder="예: 02-598-1924"
+                  maxLength={14}
+                  disabled={isLoading}
                 />
-              </td>
-            </tr>
+              </div>
+            </div>
 
-            {/* 8. 비밀번호 변경 (2열 정렬) */}
-            <tr>
-              <th>새 비밀번호</th>
-              <td>
-                <input
-                  type="password"
-                  name="newPassword"
-                  value={formData.newPassword}
-                  onChange={handleInputChange}
-                  placeholder="변경 시에만 8자 이상 입력"
-                  className="wide-input w-full"
-                />
-              </td>
-              <th>새 비밀번호 확인</th>
-              <td>
-                <input
-                  type="password"
-                  name="newPasswordConfirm"
-                  value={formData.newPasswordConfirm}
-                  onChange={handleInputChange}
-                  placeholder="새 비밀번호 재입력"
-                  className="wide-input w-full"
-                />
-              </td>
-            </tr>
-            </tbody>
-          </table>
+            {/* 하단 취소 및 완료 버튼 */}
+            <div style={{ display: 'flex', gap: '14px', marginTop: '32px' }}>
+              <button
+                type="button"
+                className="btn-id-check"
+                style={{
+                  flex: 1,
+                  padding: '13px 0',
+                  backgroundColor: 'transparent',
+                  border: '1px solid var(--border-color)',
+                  color: 'var(--text-sub)',
+                  fontSize: '14px',
+                }}
+                onClick={() => navigate(-1)}
+              >
+                취소
+              </button>
+              <button
+                type="submit"
+                className="btn-auth-submit"
+                style={{ flex: 2, margin: 0 }}
+                disabled={isLoading}
+              >
+                {isLoading ? '저장 중...' : '수정 완료'}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
 
-          {/* 하단 버튼 */}
-          <div className="wide-btn-center">
-            <button type="button" className="btn-wide-cancel" onClick={() => window.history.back()}>
-              취소
-            </button>
-            <button type="submit" className="btn-wide-submit">
-              수정완료
-            </button>
-          </div>
-        </form>
-      </div>
-
-      {/* 🔍 카카오 우편번호 검색 모달 */}
+      {/* 카카오 우편번호 모달 */}
       {isPostcodeOpen && (
         <div className="postcode-modal-overlay" onClick={() => setIsPostcodeOpen(false)}>
           <div className="postcode-modal-content" onClick={(e) => e.stopPropagation()}>
@@ -424,76 +600,6 @@ export default function ProfilePage() {
               </button>
             </div>
             <DaumPostcodeEmbed onComplete={handleCompletePostcode} autoClose />
-          </div>
-        </div>
-      )}
-
-      {/* 정회원 승격 신청 모달 */}
-      {isPromotionModalOpen && (
-        <div className="wide-modal-overlay" onClick={() => setIsPromotionModalOpen(false)}>
-          <div className="wide-modal-box" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-title-box">
-              <h3>🏢 기업부설연구소 정회원 승격 신청</h3>
-              <p>연구과제 참여 및 사내 정회원 권한 부여를 위한 신청서를 작성합니다.</p>
-            </div>
-            <form onSubmit={handlePromotionSubmit}>
-              <div className="m-group">
-                <label>희망 부서</label>
-                <input
-                  type="text"
-                  name="targetDepartment"
-                  value={formData.targetDepartment}
-                  onChange={handleInputChange}
-                  className="wide-input"
-                  required
-                />
-              </div>
-              <div className="m-group">
-                <label>희망 R&D 역할 (직책)</label>
-                <select
-                  name="targetPosition"
-                  value={formData.targetPosition}
-                  onChange={handleInputChange}
-                  className="wide-select"
-                >
-                  <option value="연구전담요원">연구전담요원</option>
-                  <option value="선임연구원">선임연구원</option>
-                  <option value="연구책임자">연구책임자</option>
-                  <option value="연구보조원">연구보조원</option>
-                </select>
-              </div>
-              <div className="m-group">
-                <label>참여 희망 과제명</label>
-                <input
-                  type="text"
-                  name="targetProject"
-                  value={formData.targetProject}
-                  onChange={handleInputChange}
-                  className="wide-input"
-                  required
-                />
-              </div>
-              <div className="m-group">
-                <label>신청 사유</label>
-                <textarea
-                  rows={3}
-                  name="promotionReason"
-                  value={formData.promotionReason}
-                  onChange={handleInputChange}
-                  placeholder="연구 수행 목표나 참여 목적을 기재하세요."
-                  className="wide-textarea"
-                  required
-                />
-              </div>
-              <div className="m-btn-row">
-                <button type="button" className="btn-wide-cancel" onClick={() => setIsPromotionModalOpen(false)}>
-                  취소
-                </button>
-                <button type="submit" className="btn-wide-submit">
-                  승격 신청
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}

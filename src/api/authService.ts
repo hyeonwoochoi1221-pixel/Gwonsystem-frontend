@@ -22,7 +22,6 @@ export interface EmailVerifyResponse {
   message: string;
 }
 
-// 🌟 아이디 찾기 요청 규격
 export interface FindUsernamePayload {
   lastName: string;
   firstName: string;
@@ -30,19 +29,16 @@ export interface FindUsernamePayload {
   email: string;
 }
 
-// 🌟 비밀번호 재설정 1단계: 인증코드 발송 요청 규격
 export interface PasswordResetSendCodePayload {
   username: string;
   email: string;
 }
 
-// 🌟 비밀번호 재설정 2단계: 인증코드 확인 요청 규격
 export interface PasswordResetVerifyCodePayload {
   email: string;
   code: string;
 }
 
-// 🌟 비밀번호 재설정 3단계: 최종 변경 확정 규격
 export interface PasswordResetConfirmPayload {
   username: string;
   email: string;
@@ -82,26 +78,44 @@ export const loginMember = async (data: LoginRequestPayload): Promise<any> => {
   return response.data;
 };
 
-// 🌟 6. 아이디 찾기 요청 (성명/연락처/이메일 대조 후 이메일 발송)
+// 6. 아이디 찾기 요청
 export const findUsername = async (data: FindUsernamePayload): Promise<{ message: string }> => {
   const response = await api.post<{ message: string }>('/api/members/find-username', data);
   return response.data;
 };
 
-// 🌟 7. 비밀번호 재설정 1단계: 인증코드 발송 요청
+// 7. 비밀번호 재설정 1단계: 인증코드 발송 요청
 export const sendPasswordResetCode = async (data: PasswordResetSendCodePayload): Promise<{ message: string }> => {
   const response = await api.post<{ message: string }>('/api/members/password/send-code', data);
   return response.data;
 };
 
-// 🌟 8. 비밀번호 재설정 2단계: 인증코드 일치 검증 요청
+// 8. 비밀번호 재설정 2단계: 인증코드 일치 검증 요청
 export const verifyPasswordResetCode = async (data: PasswordResetVerifyCodePayload): Promise<EmailVerifyResponse> => {
   const response = await api.post<EmailVerifyResponse>('/api/members/email/verify-code', data);
   return response.data;
 };
 
-// 🌟 9. 비밀번호 재설정 3단계: 최종 새 비밀번호 변경
+// 9. 비밀번호 재설정 3단계: 최종 새 비밀번호 변경
 export const resetPassword = async (data: PasswordResetConfirmPayload): Promise<{ message: string }> => {
   const response = await api.post<{ message: string }>('/api/members/password/reset', data);
+  return response.data;
+};
+
+// 🌟 10. [개인정보 수정] 현재 비밀번호 확인 요청
+export const verifyCurrentPassword = async (username: string, password: string): Promise<{ verified: boolean; message: string }> => {
+  const response = await api.post('/api/members/verify-password', { username, password });
+  return response.data;
+};
+
+// 🌟 11. [개인정보 수정] 본인 상세 프로필 데이터 로드
+export const getMemberProfile = async (username: string): Promise<any> => {
+  const response = await api.get(`/api/members/profile?username=${encodeURIComponent(username)}`);
+  return response.data;
+};
+
+// 🌟 12. [개인정보 수정] 수정된 프로필 저장 요청
+export const updateMemberProfile = async (username: string, payload: any): Promise<{ message: string; lastName: string; firstName: string }> => {
+  const response = await api.put(`/api/members/profile?username=${encodeURIComponent(username)}`, payload);
   return response.data;
 };
