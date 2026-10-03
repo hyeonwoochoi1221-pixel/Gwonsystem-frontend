@@ -96,7 +96,7 @@ export default function RegisterPage() {
   const [isEmailCodeSent, setIsEmailCodeSent] = useState(false);
   const [inputEmailCode, setInputEmailCode] = useState('');
   const [isEmailVerifying, setIsEmailVerifying] = useState(false);
-  const [isEmailVerified, setIsEmailVerified] = useState(Boolean(socialEmail));
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
   const [emailTimer, setEmailTimer] = useState(180); // 3분(180초)
 
   // 🌟 회원가입 완료 축하 모달 제어 상태
@@ -609,7 +609,7 @@ export default function RegisterPage() {
                 disabled={isLoading || Boolean(socialEmail) || isEmailVerified}
                 required
               />
-              {!socialEmail && !isEmailVerified && (
+              {!isEmailVerified && (
                 <button
                   type="button"
                   className="btn-email-action"
