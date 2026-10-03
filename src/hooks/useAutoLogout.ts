@@ -1,3 +1,4 @@
+import api from '../api/axiosInstance';
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -17,7 +18,8 @@ export function useAutoLogout() {
 
     // 로그인된 상태일 때만 타이머 가동
     if (localStorage.getItem('username')) {
-      timerRef.current = setTimeout(() => {
+      timerRef.current = setTimeout(async () => {
+        try { await api.post("/api/members/logout"); } catch { return; }
         // 세션 만료 시 스토리지 비우기
         localStorage.removeItem('username');
         localStorage.removeItem('userRole');

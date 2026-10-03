@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import Logo from '../../assets/logo.svg?react';
 import './Header.css';
+import api from '../../api/axiosInstance';
 
 const SESSION_DURATION_SEC = 30 * 60;
 
@@ -45,10 +46,11 @@ export default function Header() {
   }, [isDark]);
 
   const syncUserInfo = useCallback(() => {
-    const storedUser = localStorage.getItem('username');
-    const storedRole = localStorage.getItem('userRole');
-    setUsername(storedUser);
-    setUserRole(storedRole);
+    api.get('/api/members/me').then(({ data }) => {
+      setUsername(data.username); setUserRole(data.role);
+      localStorage.setItem('username', data.username);
+      localStorage.setItem('userRole', data.role);
+    }).catch(() => { setUsername(null); setUserRole(null); localStorage.removeItem('username'); localStorage.removeItem('userRole'); });
   }, []);
 
   useEffect(() => {
@@ -68,7 +70,8 @@ export default function Header() {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, [syncUserInfo]);
 
-  const handleLogout = useCallback((isTimeout = false) => {
+  const handleLogout = useCallback(async (isTimeout = false) => {
+    try { await api.post("/api/members/logout"); } catch { toast.error("로그아웃에 실패했습니다. 다시 시도해 주세요."); return; }
     if (timerRef.current) clearInterval(timerRef.current);
 
     localStorage.removeItem('username');
@@ -110,7 +113,8 @@ export default function Header() {
     };
   }, [username, handleLogout]);
 
-  const handleExtendSession = () => {
+  const handleExtendSession = async () => {
+    try { await api.get("/api/members/me"); } catch { toast.error("다시 로그인해 주세요."); return; }
     setTimeLeft(SESSION_DURATION_SEC);
     toast.success('로그인 세션이 30분 연장되었습니다.', { id: 'session-extend' });
   };

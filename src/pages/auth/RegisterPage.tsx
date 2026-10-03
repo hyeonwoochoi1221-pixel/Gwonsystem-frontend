@@ -454,7 +454,7 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      await registerMember(formData);
+      await registerMember({ ...formData, code: inputEmailCode.trim() } as typeof formData);
 
       setCompletedUserData({
         username: formData.username,

@@ -92,7 +92,7 @@ export const sendPasswordResetCode = async (data: PasswordResetSendCodePayload):
 
 // 8. 비밀번호 재설정 2단계: 인증코드 일치 검증 요청
 export const verifyPasswordResetCode = async (data: PasswordResetVerifyCodePayload): Promise<EmailVerifyResponse> => {
-  const response = await api.post<EmailVerifyResponse>('/api/members/email/verify-code', data);
+  const response = await api.post<EmailVerifyResponse>('/api/members/email/verify-reset-code', data);
   return response.data;
 };
 

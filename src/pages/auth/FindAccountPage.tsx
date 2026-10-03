@@ -6,7 +6,7 @@ import Logo from '../../assets/logo.svg?react';
 import {
   findUsername,
   sendPasswordResetCode,
-  verifyEmailCode,
+  verifyPasswordResetCode,
   resetPassword,
 } from '../../api/authService';
 import './Auth.css';
@@ -151,7 +151,7 @@ export default function FindAccountPage() {
     setVerifyCodeLoading(true);
 
     try {
-      const res = await verifyEmailCode(resetForm.email.trim(), resetForm.code.trim());
+      const res = await verifyPasswordResetCode({ email: resetForm.email.trim(), code: resetForm.code.trim() });
       if (res.verified) {
         setIsCodeVerified(true);
         toast.success('인증번호가 정상 확인되었습니다.');
