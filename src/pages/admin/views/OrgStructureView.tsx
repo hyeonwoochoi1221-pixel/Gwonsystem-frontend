@@ -1,16 +1,3 @@
-// src/pages/admin/views/OrgStructureView.tsx
 export default function OrgStructureView() {
-  return (
-    <section className="content-block">
-      <div className="view-title-box">
-        <h2>연구소 R&D 과제 및 역할 체계 설정</h2>
-        <p>승격 시 배정할 연구과제(Project)와 직무 코드(소장, 전담요원 등)를 관리합니다.</p>
-      </div>
-      <div className="placeholder-card">
-        <span className="placeholder-icon">🏢</span>
-        <h3>과제 및 직무 기준정보 마스터</h3>
-        <p>URL: /admin/org</p>
-      </div>
-    </section>
-  );
+  return <section className="content-block"><div className="view-title-box"><h2>연구과제 및 역할 설정</h2><p>연구과제와 참여 인원의 역할 체계를 관리합니다.</p></div><div className="workspace-banner"><strong>과제 및 역할 관리 준비 중</strong><p>과제 관리 서비스가 연결되면 연구과제를 등록하고 참여 인원과 담당 역할을 배정할 수 있습니다.</p></div></section>;
 }

@@ -3,14 +3,18 @@ import { Link } from 'react-router-dom';
 import { getNotices, deleteNotice } from '../../api/noticeService';
 import { Notice } from '../../types';
 import NoticeCreateModal from './NoticeCreateModal';
+import NoticeDetailModal from '../../components/common/NoticeDetailModal';
 import PermissionGate from '../../components/common/PermissionGate';
 import './NoticeListPage.css';
 
 export default function NoticeListPage() {
   const [notices, setNotices] = useState<Notice[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [isWriteModalOpen, setIsWriteModalOpen] = useState<boolean>(false);
+
+  // 1회 클릭 시 띄울 팝업 모달 상태
+  const [selectedNotice, setSelectedNotice] = useState<Notice | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false);
 
   const fetchNotices = () => {
     setLoading(true);
@@ -24,12 +28,14 @@ export default function NoticeListPage() {
     fetchNotices();
   }, []);
 
-  const handleRowDoubleClick = (id: number) => {
-    setExpandedId((prev) => (prev === id ? null : id));
+  // 1회 클릭으로 모달 열기
+  const handleRowClick = (notice: Notice) => {
+    setSelectedNotice(notice);
+    setIsDetailOpen(true);
   };
 
   const handleDelete = async (e: React.MouseEvent, id: number, title: string) => {
-    e.stopPropagation();
+    e.stopPropagation(); // 모달 팝업 방지
     if (!window.confirm(`"${title}" 공지사항을 정말 삭제하시겠습니까?`)) {
       return;
     }
@@ -38,7 +44,9 @@ export default function NoticeListPage() {
       await deleteNotice(id);
       alert('공지사항이 삭제되었습니다.');
       setNotices((prev) => prev.filter((item) => item.id !== id));
-      if (expandedId === id) setExpandedId(null);
+      if (selectedNotice?.id === id) {
+        setIsDetailOpen(false);
+      }
     } catch (err) {
       alert('삭제 처리에 실패했습니다. (권한을 확인하세요)');
     }
@@ -51,15 +59,15 @@ export default function NoticeListPage() {
         <div className="notice-page-header">
           <div className="notice-header-title">
             <h1>📢 사내 공지사항 목록</h1>
-            <p className="notice-subtext">* 항목을 더블클릭하면 본문 내용을 열람할 수 있습니다.</p>
+            <p className="notice-subtext">* 항목을 클릭하면 상세 내용을 확인하실 수 있습니다.</p>
           </div>
           <div className="notice-header-actions">
-            {/* 정회원 및 최고관리자에게만 작성 버튼 노출 */}
+            {/* 정회원 및 관리자 전용 작성 버튼 */}
             <PermissionGate requiresManager>
               <button
                 type="button"
                 className="btn-create-notice"
-                onClick={() => setIsModalOpen(true)}
+                onClick={() => setIsWriteModalOpen(true)}
               >
                 + 공지 작성
               </button>
@@ -88,65 +96,56 @@ export default function NoticeListPage() {
               </tr>
               </thead>
               <tbody>
-              {notices.map((notice) => {
-                const isExpanded = expandedId === notice.id;
+              {notices.map((notice) => (
+                <tr
+                  key={notice.id}
+                  onClick={() => handleRowClick(notice)}
+                  className={`notice-row ${notice.isPinned ? 'row-pinned' : ''}`}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <td className="td-category">
+                      <span className={notice.isPinned ? 'badge-pinned' : 'badge-category'}>
+                        {notice.isPinned ? '★ 중요' : notice.category || notice.dept || '일반'}
+                      </span>
+                  </td>
+                  <td className="td-title">
+                    {notice.isPinned && <strong className="pinned-mark">[공지] </strong>}
+                    {notice.title}
+                  </td>
+                  <td className="td-views">{notice.viewCount ?? 0}</td>
+                  <td className="td-date">{notice.date}</td>
 
-                return (
-                  <React.Fragment key={notice.id}>
-                    <tr
-                      onDoubleClick={() => handleRowDoubleClick(notice.id)}
-                      className={`notice-row ${isExpanded ? 'row-expanded' : ''} ${notice.isPinned ? 'row-pinned' : ''}`}
-                    >
-                      <td className="td-category">
-                          <span className={notice.isPinned ? 'badge-pinned' : 'badge-category'}>
-                            {notice.isPinned ? '★ 중요' : notice.category || notice.dept || '일반'}
-                          </span>
-                      </td>
-                      <td className="td-title">
-                        {notice.isPinned && <strong className="pinned-mark">[공지] </strong>}
-                        {notice.title}
-                      </td>
-                      <td className="td-views">{notice.viewCount ?? 0}</td>
-                      <td className="td-date">{notice.date}</td>
-
-                      {/* 정회원 및 관리자 전용 삭제 버튼 */}
-                      <PermissionGate requiresManager>
-                        <td className="td-manage">
-                          <button
-                            type="button"
-                            onClick={(e) => handleDelete(e, notice.id, notice.title)}
-                            className="btn-delete-item"
-                          >
-                            삭제
-                          </button>
-                        </td>
-                      </PermissionGate>
-                    </tr>
-
-                    {/* 더블클릭 시 슬라이드되는 본문 영역 */}
-                    {isExpanded && (
-                      <tr className="notice-detail-row">
-                        <td colSpan={6} className="notice-detail-content">
-                          <div className="detail-header">[공지 본문 내용]</div>
-                          <div className="detail-body">
-                            {notice.content || '등록된 본문 상세 내용이 없습니다.'}
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                  </React.Fragment>
-                );
-              })}
+                  {/* 정회원 및 관리자 전용 삭제 버튼 */}
+                  <PermissionGate requiresManager>
+                    <td className="td-manage">
+                      <button
+                        type="button"
+                        onClick={(e) => handleDelete(e, notice.id, notice.title)}
+                        className="btn-delete-item"
+                      >
+                        삭제
+                      </button>
+                    </td>
+                  </PermissionGate>
+                </tr>
+              ))}
               </tbody>
             </table>
           </div>
         )}
 
-        {/* 작성 모달 */}
+        {/* 신규 등록 모달 */}
         <NoticeCreateModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          isOpen={isWriteModalOpen}
+          onClose={() => setIsWriteModalOpen(false)}
           onSuccess={fetchNotices}
+        />
+
+        {/* 1회 클릭 시 열리는 상세 보기 모달 */}
+        <NoticeDetailModal
+          notice={selectedNotice}
+          isOpen={isDetailOpen}
+          onClose={() => setIsDetailOpen(false)}
         />
       </div>
     </div>

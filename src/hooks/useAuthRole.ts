@@ -6,10 +6,13 @@ export type UserRole = 'ROLE_SUPERVISOR' | 'ROLE_REGULAR' | 'ROLE_ASSOCIATE' | '
 export const useAuthRole = () => {
   // 실제 서비스 환경에서는 LocalStorage, 쿠키 또는 전역 상태(Context/Zustand)의 JWT 파싱 값을 사용합니다.
   const [role, setRole] = useState<UserRole>('GUEST');
+  const [isLoading, setIsLoading] = useState(true);
+  const [username, setUsername] = useState('');
   useEffect(() => {
     let active = true;
-    api.get('/api/members/me').then(({ data }) => { if (active) setRole(data.role); })
-      .catch(() => { if (active) setRole('GUEST'); });
+    api.get('/api/members/me').then(({ data }) => { if (active) { setRole(data.role); setUsername(`${data.lastName || ''}${data.firstName || ''}` || data.username); } })
+      .catch(() => { if (active) setRole('GUEST'); })
+      .finally(() => { if (active) setIsLoading(false); });
     return () => { active = false; };
   }, []);
 
@@ -21,6 +24,8 @@ export const useAuthRole = () => {
 
   return {
     role,
+    isLoading,
+    username,
     canManageContent,
     isSupervisor,
     isAuthenticated: role !== 'GUEST',

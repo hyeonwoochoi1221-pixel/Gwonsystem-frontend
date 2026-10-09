@@ -1,133 +1,64 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { getNotices } from '../../api/noticeService';
 import { Notice } from '../../types';
-import Logo from '../../assets/logo.svg?react';
+import { useAuthRole } from '../../hooks/useAuthRole';
+import SemiconductorHero from '../../components/home/SemiconductorHero';
+import HomeEvents from '../../components/home/HomeEvents';
+import HomeGallery from '../../components/home/HomeGallery';
+import NoticeDetailModal from '../../components/common/NoticeDetailModal';
 import './HomePage.css';
 
 export default function HomePage() {
   const [notices, setNotices] = useState<Notice[]>([]);
-
-  useEffect(() => {
-    getNotices()
-      .then((data) => setNotices(data.slice(0, 5))) // 최신 공지 5건
-      .catch(console.error);
-  }, []);
-
-  return (
-    <div className="academic-home-container">
-      {/* 1. 상단 대형 와이드 배너 */}
-      <section className="portal-hero-banner">
-        <div className="hero-banner-content">
-          <div className="hero-logo-badge">
-            <Logo className="hero-logo-svg" />
-            <span className="hero-logo-text">G-WON SYSTEM</span>
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [selectedNotice, setSelectedNotice] = useState<Notice | null>(null);
+  const { canManageContent, isSupervisor, isLoading } = useAuthRole();
+  const location = useLocation();
+  const load = () => { setStatus('loading'); getNotices().then(data => { setNotices(data); setStatus('ready'); }).catch(() => setStatus('error')); };
+  useEffect(() => { load(); }, []);
+  useEffect(() => { if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView({ block: 'start' }); }, [location.hash]);
+  const sorted = [...notices].sort((a, b) => Number(Boolean(b.isPinned)) - Number(Boolean(a.isPinned)) || b.date.localeCompare(a.date));
+  const renderBoard = (title: string, news: boolean) => {
+    const entries = sorted.filter(n => (n.category === '사내소식') === news).slice(0, 5);
+    return <section className="home-news home-overview-card" aria-label={title}>
+      <div className="home-section-heading"><h2>{title}</h2><Link to="/notice">전체 보기 →</Link></div>
+      <div className="portal-notice-list" aria-live="polite">
+        {status === 'loading' ? <p className="empty-text">소식을 불러오고 있습니다…</p> : status === 'error' ? <div className="empty-text"><p>소식을 불러오지 못했습니다.</p><button type="button" className="tab-btn" onClick={load}>다시 시도</button></div> : entries.length === 0 ? <p className="empty-text">등록된 {title}이 없습니다.</p> : entries.map(n => <button type="button" key={n.id} className="interactive-notice-row" onClick={() => setSelectedNotice(n)}>{n.isPinned && <span className="category-tag pinned">중요</span>}<span className="row-title">{n.title}</span><time className="row-date">{n.date}</time></button>)}
+      </div>
+    </section>;
+  };
+  return <div className="academic-home-container">
+    <SemiconductorHero />
+    <main className="home-content" id="home-updates">
+      <div className="home-overview-grid">
+        {renderBoard('공지사항', false)}
+        <HomeEvents canAdd={isSupervisor && !isLoading} />
+        <HomeGallery compact canAdd={canManageContent && !isLoading} />
+        <section id="technology" className="home-overview-card home-research" aria-labelledby="research-heading">
+          <div className="home-section-heading"><h2 id="research-heading">주요 보유 기술</h2><span className="research-example-label">예시 데이터</span></div>
+          <p className="research-intro">기업부설연구소의 기술 분야를 소개합니다. 아래 내용은 구성 검토를 위한 예시입니다.</p>
+          <div className="research-list">
+            {[
+              { title: '반도체 시스템 설계', description: '다양한 연산 장치를 연결하는 시스템 구조와 인터페이스 설계 기술을 연구합니다.', keywords: ['SoC', '인터페이스', '시스템 설계'], application: '센서 데이터 처리 및 연산 모듈 연동', scope: '시스템 요구사항 분석, 구조 설계, 기능 검증' },
+              { title: '데이터 수집·분석 플랫폼', description: '연구 데이터를 수집하고 분석할 수 있는 통합 플랫폼 기술을 연구합니다.', keywords: ['데이터 파이프라인', '분석', '모니터링'], application: '실험 데이터 통합 관리 및 결과 시각화', scope: '데이터 수집 구조 설계, 처리 자동화, 분석 화면 구현' },
+              { title: '클라우드 인프라·자동화', description: '연구 서비스의 안정적인 운영을 위한 인프라 구성과 자동화 기술을 연구합니다.', keywords: ['클라우드', '운영 자동화', '인프라'], application: '연구 환경 구축 및 서비스 운영', scope: '환경 구성, 배포 자동화, 운영 상태 모니터링' },
+            ].map(technology => <details className="research-item" key={technology.title}>
+              <summary><span>{technology.title}</span><span className="research-expand" aria-hidden="true">+</span></summary>
+              <p>{technology.description}</p>
+              <ul className="research-keywords" aria-label="핵심 키워드">{technology.keywords.map(keyword => <li key={keyword}>{keyword}</li>)}</ul>
+              <dl><dt>적용 분야</dt><dd>{technology.application}</dd><dt>연구 범위</dt><dd>{technology.scope}</dd></dl>
+            </details>)}
           </div>
-          <p className="hero-subtext">Heterogeneous SoC Innovations & Cloud Infrastructure</p>
-          <h1 className="hero-main-title">G-WON SYSTEM 2026</h1>
-          <h2 className="hero-conference-desc">Innovative System & Cloud Architecture Portal</h2>
-          <div className="hero-meta-badge">
-            <span>📅 2026. 10. 11 - 14</span>
-            <span className="divider">|</span>
-            <span>📍 Pyeongtaek Convention Center, Korea</span>
-          </div>
-        </div>
-      </section>
-
-      {/* 2. 메인 콘텐츠 2x2 카드 그리드 */}
-      <main className="portal-grid-section">
-        {/* [좌상단] 공지사항 */}
-        <div className="portal-card">
-          <div className="card-top-bar">
-            <h3>공지사항</h3>
-            <Link to="/notice" className="btn-more">+ more</Link>
-          </div>
-          <ul className="portal-notice-list">
-            {notices.length === 0 ? (
-              <li className="empty-text">등록된 공지사항이 없습니다.</li>
-            ) : (
-              notices.map((n) => (
-                <li key={n.id} className="portal-notice-item">
-                  <span className="notice-title">
-                    {n.isPinned && <strong className="pinned-star">[중요] </strong>}
-                    {n.title}
-                  </span>
-                  <span className="notice-date">{n.date}</span>
-                </li>
-              ))
-            )}
-          </ul>
-        </div>
-
-        {/* [우상단] 학술/주요 행사 및 일정 */}
-        <div className="portal-card">
-          <div className="card-top-bar">
-            <h3>주요 행사 및 일정</h3>
-            <Link to="/schedules" className="btn-more">+ more</Link>
-          </div>
-          <div className="event-grid">
-            <div className="event-item-box">
-              <span className="event-badge">인프라점검</span>
-              <p className="event-title">하반기 보안 정기 점검 세미나</p>
-              <span className="event-date">2026-10-11 ~ 2026-10-14</span>
-            </div>
-            <div className="event-item-box">
-              <span className="event-badge">전사미팅</span>
-              <p className="event-title">클라우드 DX 컨퍼런스 2026</p>
-              <span className="event-date">2026-11-05</span>
-            </div>
-          </div>
-        </div>
-
-        {/* [좌하단] 사내 소식 */}
-        <div className="portal-card">
-          <div className="card-top-bar">
-            <h3>사내 소식</h3>
-            <Link to="/news" className="btn-more">+ more</Link>
-          </div>
-          <ul className="portal-notice-list">
-            <li className="portal-notice-item">
-              <span className="notice-title">2026년 신규 클라우드 인프라 아키텍처 도입</span>
-              <span className="notice-date">2026-09-10</span>
-            </li>
-            <li className="portal-notice-item">
-              <span className="notice-title">GWON SYSTEM 평택 데이터센터 증설 안내</span>
-              <span className="notice-date">2026-08-28</span>
-            </li>
-            <li className="portal-notice-item">
-              <span className="notice-title">사내 DX 자동화 파이프라인 개발 완료</span>
-              <span className="notice-date">2026-08-15</span>
-            </li>
-          </ul>
-        </div>
-
-        {/* [우하단] 포토 갤러리 */}
-        <div className="portal-card">
-          <div className="card-top-bar">
-            <h3>포토갤러리</h3>
-            <Link to="/gallery" className="btn-more">+ more</Link>
-          </div>
-          <div className="gallery-thumbnail-row">
-            <div className="gallery-thumb">
-              <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=400&auto=format&fit=crop" alt="행사사진 1" />
-              <p>전사 컨퍼런스 현장</p>
-            </div>
-            <div className="gallery-thumb">
-              <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=400&auto=format&fit=crop" alt="행사사진 2" />
-              <p>인프라 기술 연구회</p>
-            </div>
-          </div>
-        </div>
-      </main>
-
-      {/* 3. About Us & 회사 위치 구글 지도 (하단 유지) */}
-      <section id="about" className="section-wrapper">
+        </section>
+      </div>
+      <section id="about" className="home-company">
         <div className="section-header">
           <h2>About Us & Location</h2>
           <p>GWON SYSTEM 본사 위치 및 회사 개요</p>
         </div>
 
-        <div className="about-grid">
+        <div id="contact" className="about-grid">
           <div className="about-info-card">
             <h3>디지털 비즈니스의 신뢰할 수 있는 기반</h3>
             <p>
@@ -154,7 +85,7 @@ export default function HomePage() {
           <div className="map-container">
             <iframe
               title="GWON SYSTEM 위치"
-              src="https://www.google.com/maps/embed?pb=!1m5!3m3!1m2!1s0x357ca104edf5147f%3A0x642c12d36829e252!2z64yA7ZWc66-86rWtIOyEnOyauO2KueuzhOyLnCDshJzstIjqtawg66qF64us66GcIDE5!5e0!3m2!1sko!2sus!4v1789302678606!5m2!1sko!2sus"
+              src="https://maps.google.com/maps?q=서울특별시%20서초구%20방배동%201002-14&output=embed"
               width="100%"
               height="100%"
               style={{ border: 0, borderRadius: '8px' }}
@@ -164,6 +95,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-    </div>
-  );
+    </main>
+    <NoticeDetailModal notice={selectedNotice} isOpen={!!selectedNotice} onClose={() => setSelectedNotice(null)} />
+  </div>;
 }

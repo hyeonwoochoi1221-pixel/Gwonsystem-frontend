@@ -26,6 +26,13 @@ import PortalResearchNoteView from './pages/portal/views/PortalResearchNoteView'
 import PortalMilestonesView from './pages/portal/views/PortalMilestonesView';
 import PortalAttendanceView from './pages/portal/views/PortalAttendanceView';
 import './App.css';
+import ProtectedRoute from './components/common/ProtectedRoute';
+import PortalOverviewView from './pages/portal/views/PortalOverviewView';
+import GalleryPage from './pages/gallery/GalleryPage';
+import GalleryCreatePage from './pages/gallery/GalleryCreatePage';
+
+import BannerManagePage from './pages/banners/BannerManagePage';
+import BannerCreatePage from './pages/banners/BannerCreatePage';
 
 export default function App() {
   return (
@@ -71,6 +78,10 @@ export default function App() {
           {/* 1. 공개 페이지 라우트 */}
           <Route path="/" element={<HomePage />} />
           <Route path="/notice" element={<NoticeListPage />} />
+          <Route path="/gallery" element={<GalleryPage />} />
+          <Route element={<ProtectedRoute allowedRoles={['ROLE_REGULAR', 'ROLE_SUPERVISOR']} />}>
+            <Route path="/gallery/new" element={<GalleryCreatePage />} />
+          </Route>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/oauth/callback" element={<OAuthCallback />} />
@@ -82,6 +93,9 @@ export default function App() {
           <Route path="/profile" element={<ProfilePage />} />
 
           {/* 3. 🛡️ 슈퍼바이저 관리자 콘솔 (사이드바 중첩 라우트) */}
+          <Route element={<ProtectedRoute allowedRoles={['ROLE_SUPERVISOR']} />}>
+          <Route path="/banners" element={<BannerManagePage />} />
+          <Route path="/banners/new" element={<BannerCreatePage />} />
           <Route path="/admin" element={<SupervisorAdminPage />}>
             <Route index element={<Navigate to="promotions" replace />} />
             <Route path="promotions" element={<PromotionApprovalView />} />
@@ -89,15 +103,19 @@ export default function App() {
             <Route path="org" element={<OrgStructureView />} />
             <Route path="security" element={<SecurityLogsView />} />
           </Route>
+          </Route>
 
           {/* 4. 🏢 정회원용 기업부설연구소 포털 (사이드바 중첩 라우트) */}
+          <Route element={<ProtectedRoute allowedRoles={['ROLE_REGULAR', 'ROLE_SUPERVISOR']} />}>
           <Route path="/portal" element={<RegularPortalPage />}>
-            <Route index element={<Navigate to="roadmap" replace />} />
+            <Route index element={<PortalOverviewView />} />
             <Route path="roadmap" element={<PortalRoadmapView />} />
             <Route path="notes" element={<PortalResearchNoteView />} />
             <Route path="milestones" element={<PortalMilestonesView />} />
             <Route path="attendance" element={<PortalAttendanceView />} />
           </Route>
+          </Route>
+          <Route path="*" element={<main className="access-state"><h1>페이지를 찾을 수 없습니다</h1><a href="/">메인으로 돌아가기</a></main>} />
         </Routes>
         <Footer />
         <ScrollToTopButton />

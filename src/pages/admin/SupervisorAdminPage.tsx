@@ -49,7 +49,7 @@ export default function SupervisorAdminPage() {
         <div className="sidebar-footer">
           <div className="system-status-indicator">
             <span className="status-dot"></span>
-            <span>시스템 정상 가동 중</span>
+            <span>슈퍼바이저 전용 공간</span>
           </div>
         </div>
       </aside>

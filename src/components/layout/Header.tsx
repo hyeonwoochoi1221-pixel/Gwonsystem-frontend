@@ -150,46 +150,61 @@ export default function Header() {
     return localStorage.getItem('username') || '';
   };
 
+  // 🌟 이모티콘 없이 심플하게 텍스트와 클래스명 반환
+  const getRoleBadgeInfo = (role: string | null) => {
+    switch (role) {
+      case 'ROLE_SUPERVISOR':
+        return { text: '관리자', className: 'role-badge-supervisor' };
+      case 'ROLE_REGULAR':
+        return { text: '정회원', className: 'role-badge-regular' };
+      default:
+        return { text: '일반회원', className: 'role-badge-associate' };
+    }
+  };
+
+  const roleBadge = getRoleBadgeInfo(userRole);
+
   return (
     <>
       <header className={`header-fixed-container ${isScrolled ? 'is-scrolled' : ''}`}>
         {/* 1단: 상단 유틸 탑바 */}
         <div className="login-top-header">
           <div className="login-header-inner">
-            <span className="portal-badge">GWON INTRANET PORTAL</span>
+            <div className="top-header-left-empty"></div>
 
             <div className="login-right">
               {username ? (
                 <div className="user-greet-box">
+                  {/* 회원 등급 뱃지 (이모티콘 없이 플랫 텍스트) */}
+                  <span className={`clean-role-badge ${roleBadge.className}`}>
+                    {roleBadge.text}
+                  </span>
+
                   <div className="user-auth-meta-group">
+                    {/* 사용자 성명 & 정보수정 */}
                     <div className="meta-col">
-                      <span className="user-name-text">{getFormattedFullName()}</span>
-                      <Link to="/profile" className="meta-link-action">정보수정</Link>
+                      <span className="user-name-text">{getFormattedFullName()}님</span>
+                      <Link to="/profile" className="meta-btn-action">
+                        정보수정
+                      </Link>
                     </div>
 
+                    <span className="meta-divider-line"></span>
+
+                    {/* 세션 남은 시간 & 로그인 연장 */}
                     <div className="meta-col">
                       <span className={`session-time-text ${timeLeft <= 300 ? 'warning' : ''}`}>
                         {formatTimeKorean(timeLeft)}
                       </span>
                       <button
                         type="button"
-                        className="meta-link-action btn-link"
+                        className="meta-btn-action btn-extend-clean"
                         onClick={handleExtendSession}
                       >
-                        로그인 연장
+                        연장
                       </button>
                     </div>
                   </div>
-
-                  {userRole && (
-                    <span className="user-role-tag">
-                      {userRole === 'ROLE_SUPERVISOR'
-                        ? '관리자'
-                        : userRole === 'ROLE_REGULAR'
-                          ? '정회원'
-                          : '일반회원'}
-                    </span>
-                  )}
 
                   <button
                     type="button"
@@ -224,30 +239,28 @@ export default function Header() {
             <nav className={`nav-menu ${isMenuOpen ? 'mobile-open' : ''}`}>
               <Link to="/#about" className="nav-item-box" onClick={closeMenu}>회사소개</Link>
               <Link to="/notice" className="nav-item-box" onClick={closeMenu}>공지사항</Link>
-              <Link to="/services" className="nav-item-box" onClick={closeMenu}>주요기술</Link>
-              <Link to="/contact" className="nav-item-box" onClick={closeMenu}>문의하기</Link>
+              <Link to="/#technology" className="nav-item-box" onClick={closeMenu}>주요 보유 기술</Link>
+              <Link to="/#contact" className="nav-item-box" onClick={closeMenu}>문의하기</Link>
 
-              {/* 🏢 정회원 이상 (ROLE_REGULAR, ROLE_SUPERVISOR) 포털 메뉴 */}
+              {/* 정회원 이상 연구소 포털 */}
               {(userRole === 'ROLE_REGULAR' || userRole === 'ROLE_SUPERVISOR') && (
                 <Link
                   to="/portal"
                   className="nav-item-box portal-nav-item"
                   onClick={closeMenu}
-                  style={{ color: 'var(--accent-color)', fontWeight: '700' }}
                 >
-                  🏢 연구소 포털
+                  연구소 포털
                 </Link>
               )}
 
-              {/* ⚙️ 슈퍼바이저(ROLE_SUPERVISOR) 전용 시스템 콘솔 메뉴 */}
+              {/* 관리자 전용 시스템 관리 */}
               {userRole === 'ROLE_SUPERVISOR' && (
                 <Link
                   to="/admin"
                   className="nav-item-box admin-nav-item"
                   onClick={closeMenu}
-                  style={{ color: '#ef4444', fontWeight: '700' }}
                 >
-                  ⚙️ 시스템 관리
+                  시스템 관리
                 </Link>
               )}
 
@@ -256,13 +269,14 @@ export default function Header() {
                 type="button"
                 className={`minimal-theme-toggle ${isDark ? 'dark' : 'light'}`}
                 onClick={handleToggleTheme}
-                aria-label="다크/라이트 테마 전환"
+                aria-label={isDark ? '라이트 모드로 전환' : '다크 모드로 전환'}
                 title={isDark ? '라이트 모드로 전환' : '다크 모드로 전환'}
+                aria-pressed={isDark}
               >
-                <span className="toggle-track">
-                  <span className="toggle-thumb">
-                    {isDark ? '🌙' : '☀️'}
-                  </span>
+                <span className="toggle-track" aria-hidden="true">
+                  <span className="toggle-thumb" />
+                  <svg className="theme-icon theme-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="4" /><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" /></svg>
+                  <svg className="theme-icon theme-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20.9 13.1A9 9 0 0 1 10.9 3.1a9 9 0 1 0 10 10Z" /></svg>
                 </span>
               </button>
             </nav>

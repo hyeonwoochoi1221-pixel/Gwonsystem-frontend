@@ -1,0 +1,21 @@
+.gallery-page { width:100%; max-width:1280px; padding:36px 32px 72px; margin:0 auto; box-sizing:border-box; text-align:left; }
+.gallery-page .home-gallery { margin:24px 0; }
+.gallery-page .gallery-grid { align-items:stretch; }
+.gallery-page .gallery-grid .gallery-card { display:flex; flex-direction:column; min-width:0; }
+.gallery-page .gallery-grid .gallery-card>img { width:100%; height:auto; aspect-ratio:4/3; object-fit:contain; flex:none; }
+.gallery-page .gallery-grid .gallery-card>div { display:flex; flex-direction:column; flex:1; }
+.gallery-page .gallery-grid .gallery-card h3 { line-height:1.5; min-height:3em; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; }
+.gallery-page .gallery-grid .gallery-card p { line-height:1.8; min-height:5.4em; margin:0 0 16px; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; overflow:hidden; }
+.gallery-page .gallery-grid .gallery-card a { margin-top:auto; padding-top:14px; }
+.gallery-page .gallery-grid .gallery-delete-button { align-self:flex-start; }
+.gallery-page h1 { font-size:32px; line-height:1.5; font-weight:700; color:var(--text-main); margin:12px 0; letter-spacing:-.03em; }
+.gallery-back { display:inline-block; color:var(--text-sub); font-size:14px; text-decoration:none; margin-bottom:24px; }
+.gallery-add-link { text-decoration:none; display:inline-block; }
+.gallery-create-layout { display:grid; grid-template-columns:1.1fr 1fr; gap:32px; align-items:start; }
+.gallery-create-preview { border:1px solid var(--border-color); background:var(--bg-hover); padding:26px; border-radius:14px; }
+.gallery-create-preview h2 { color:var(--text-main); font-size:20px; margin-bottom:20px; }
+.gallery-image-placeholder { display:grid; place-items:center; min-height:220px; padding:24px; box-sizing:border-box; color:var(--text-sub); font-size:14px; text-align:center; }
+.gallery-public-note { color:var(--text-sub); font-size:13px; line-height:1.8; margin-top:20px; }
+.gallery-page .gallery-form { margin:0; }.gallery-page .gallery-form small { color:var(--text-sub); font-size:12px; }
+.gallery-card a { color:var(--accent-color); font-size:13px; display:inline-block; margin-top:14px; }
+@media(max-width:768px) { .gallery-page { padding:24px 20px 48px; }.gallery-create-layout { grid-template-columns:1fr; }.gallery-page h1 { font-size:26px; }.gallery-create-preview { padding:20px; } }

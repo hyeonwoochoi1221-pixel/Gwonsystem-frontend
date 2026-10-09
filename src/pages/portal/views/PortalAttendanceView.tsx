@@ -1,27 +1,3 @@
-// src/pages/portal/views/PortalAttendanceView.tsx
-import toast from 'react-hot-toast';
-
 export default function PortalAttendanceView() {
-  return (
-    <section className="portal-content-block">
-      <div className="portal-title-row">
-        <div>
-          <h2>연구 전념성 및 근태 기록</h2>
-          <p>연구전담요원의 연구 전념 의무(타 업무 미겸직)를 증빙하는 타임스탬프 현황입니다.</p>
-        </div>
-        <button
-          type="button"
-          className="btn-primary-action"
-          onClick={() => toast.success('금일 출근 타임스탬프가 기록되었습니다.')}
-        >
-          출근 타임스탬프 찍기
-        </button>
-      </div>
-      <div className="portal-placeholder-card">
-        <span className="placeholder-icon">⏰</span>
-        <h3>월간 누적 연구 투입시간 로그</h3>
-        <p>URL: /portal/attendance</p>
-      </div>
-    </section>
-  );
+  return <section className="portal-content-block"><div className="portal-title-row"><div><span className="workspace-eyebrow">ATTENDANCE</span><h2>오늘의 근태</h2><p>출퇴근 기록과 월별 연구 투입시간을 확인합니다.</p></div><button className="btn-primary-action" disabled>출근 기록 · 준비 중</button></div><div className="workspace-banner"><strong>근태 기록 서비스 준비 중</strong><p>서비스 연결 후 출근과 퇴근을 기록할 수 있습니다. 현재 출근 기록은 저장되지 않습니다.</p></div></section>;
 }

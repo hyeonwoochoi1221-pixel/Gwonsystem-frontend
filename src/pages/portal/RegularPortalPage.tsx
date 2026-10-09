@@ -13,6 +13,7 @@ export default function RegularPortalPage() {
         </div>
 
         <nav className="sidebar-nav">
+          <NavLink to="/portal" end className={({ isActive }) => `nav-btn ${isActive ? 'active' : ''}`}><span className="nav-icon" aria-hidden="true">⌂</span><span className="nav-text">내 업무 홈</span></NavLink>
           <NavLink
             to="/portal/roadmap"
             className={({ isActive }) => `nav-btn ${isActive ? 'active' : ''}`}
@@ -49,7 +50,7 @@ export default function RegularPortalPage() {
         <div className="sidebar-footer">
           <div className="researcher-info-pill">
             <span className="online-indicator"></span>
-            <span>연구전담 인력 활성화됨</span>
+            <span>정회원 전용 업무 공간</span>
           </div>
         </div>
       </aside>

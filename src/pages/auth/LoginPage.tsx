@@ -73,7 +73,8 @@ export default function LoginPage() {
       toast.success(`${welcomeName}님, 로그인되었습니다.`);
 
       // 4. 메인 대시보드로 이동
-      navigate('/');
+      const destination = (location.state as { from?: string } | null)?.from;
+      navigate(destination?.startsWith('/') && !destination.startsWith('//') ? destination : '/', { replace: true });
     } catch (error: any) {
       console.error('로그인 에러:', error);
       const serverMessage =

@@ -12,7 +12,7 @@ const api = axios.create({
 
 api.interceptors.request.use(async config => {
   if (!['get', 'head', 'options'].includes((config.method || 'get').toLowerCase())) {
-    const response = await api.get<{ token: string; headerName: string }>('/api/members/csrf');
+    const response = await api.get<{ token: string; headerName: string }>('/api/members/csrf', { timeout: 60000 });
     config.headers.set(response.data.headerName, response.data.token);
   }
   return config;
