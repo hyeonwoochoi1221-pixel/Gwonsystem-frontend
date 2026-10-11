@@ -27,7 +27,6 @@ export default function NoticeCreateModal({ isOpen, onClose, onSuccess }: Props)
     setSubmitting(true);
     try {
       const payload: NoticeCreateRequest = {
-        authorId: 1, // 테스트용 임직원 ID
         category,
         title,
         content,

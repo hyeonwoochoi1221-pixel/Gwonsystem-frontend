@@ -15,7 +15,6 @@ export interface Notice {
 
 // 신규 공지 등록 시 백엔드로 보낼 요청 DTO 규격
 export interface NoticeCreateRequest {
-  authorId?: number;
   category: string;
   title: string;
   content: string;

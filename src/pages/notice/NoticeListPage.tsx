@@ -6,6 +6,7 @@ import NoticeCreateModal from './NoticeCreateModal';
 import NoticeDetailModal from '../../components/common/NoticeDetailModal';
 import PermissionGate from '../../components/common/PermissionGate';
 import './NoticeListPage.css';
+import { useNoticeDetail } from '../../hooks/useNoticeDetail';
 
 export default function NoticeListPage() {
   const [notices, setNotices] = useState<Notice[]>([]);
@@ -13,8 +14,9 @@ export default function NoticeListPage() {
   const [isWriteModalOpen, setIsWriteModalOpen] = useState<boolean>(false);
 
   // 1회 클릭 시 띄울 팝업 모달 상태
-  const [selectedNotice, setSelectedNotice] = useState<Notice | null>(null);
-  const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false);
+  const detail = useNoticeDetail((loaded) => {
+    setNotices(prev => prev.map(item => item.id === loaded.id ? loaded : item));
+  });
 
   const fetchNotices = () => {
     setLoading(true);
@@ -30,8 +32,7 @@ export default function NoticeListPage() {
 
   // 1회 클릭으로 모달 열기
   const handleRowClick = (notice: Notice) => {
-    setSelectedNotice(notice);
-    setIsDetailOpen(true);
+    void detail.open(notice.id);
   };
 
   const handleDelete = async (e: React.MouseEvent, id: number, title: string) => {
@@ -44,9 +45,7 @@ export default function NoticeListPage() {
       await deleteNotice(id);
       alert('공지사항이 삭제되었습니다.');
       setNotices((prev) => prev.filter((item) => item.id !== id));
-      if (selectedNotice?.id === id) {
-        setIsDetailOpen(false);
-      }
+      if (detail.selectedId === id) detail.close();
     } catch (err) {
       alert('삭제 처리에 실패했습니다. (권한을 확인하세요)');
     }
@@ -143,9 +142,11 @@ export default function NoticeListPage() {
 
         {/* 1회 클릭 시 열리는 상세 보기 모달 */}
         <NoticeDetailModal
-          notice={selectedNotice}
-          isOpen={isDetailOpen}
-          onClose={() => setIsDetailOpen(false)}
+          notice={detail.notice}
+          isOpen={detail.isOpen}
+          loading={detail.loading}
+          error={detail.error}
+          onClose={detail.close}
         />
       </div>
     </div>
