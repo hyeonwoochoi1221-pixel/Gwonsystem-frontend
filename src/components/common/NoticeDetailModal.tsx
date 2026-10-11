@@ -5,9 +5,11 @@ interface NoticeDetailModalProps {
   notice: Notice | null;
   isOpen: boolean;
   onClose: () => void;
+  loading?: boolean;
+  error?: string | null;
 }
 
-export default function NoticeDetailModal({ notice, isOpen, onClose }: NoticeDetailModalProps) {
+export default function NoticeDetailModal({ notice, isOpen, onClose, loading = false, error = null }: NoticeDetailModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!isOpen) return;
@@ -32,7 +34,17 @@ export default function NoticeDetailModal({ notice, isOpen, onClose }: NoticeDet
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  if (!isOpen || !notice) return null;
+  if (!isOpen) return null;
+
+  if (loading || error || !notice) return (
+    <div className="notice-modal-overlay" onClick={onClose}>
+      <div className="notice-modal-dialog" ref={dialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="notice-detail-title" aria-busy={loading} onClick={e => e.stopPropagation()}>
+        <h2 id="notice-detail-title">공지사항 상세</h2>
+        {loading ? <p role="status">공지사항을 불러오는 중입니다...</p> : <p role="alert">{error || '공지사항을 표시할 수 없습니다.'}</p>}
+        <button type="button" onClick={onClose}>닫기</button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="notice-modal-overlay" onClick={onClose}>

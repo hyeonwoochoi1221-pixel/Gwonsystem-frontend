@@ -8,11 +8,14 @@ import HomeEvents from '../../components/home/HomeEvents';
 import HomeGallery from '../../components/home/HomeGallery';
 import NoticeDetailModal from '../../components/common/NoticeDetailModal';
 import './HomePage.css';
+import { useNoticeDetail } from '../../hooks/useNoticeDetail';
 
 export default function HomePage() {
   const [notices, setNotices] = useState<Notice[]>([]);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
-  const [selectedNotice, setSelectedNotice] = useState<Notice | null>(null);
+  const detail = useNoticeDetail(loaded => {
+    setNotices(prev => prev.map(item => item.id === loaded.id ? loaded : item));
+  });
   const { canManageContent, isSupervisor, isLoading } = useAuthRole();
   const location = useLocation();
   const load = () => { setStatus('loading'); getNotices().then(data => { setNotices(data); setStatus('ready'); }).catch(() => setStatus('error')); };
@@ -24,7 +27,7 @@ export default function HomePage() {
     return <section className="home-news home-overview-card" aria-label={title}>
       <div className="home-section-heading"><h2>{title}</h2><Link to="/notice">전체 보기 →</Link></div>
       <div className="portal-notice-list" aria-live="polite">
-        {status === 'loading' ? <p className="empty-text">소식을 불러오고 있습니다…</p> : status === 'error' ? <div className="empty-text"><p>소식을 불러오지 못했습니다.</p><button type="button" className="tab-btn" onClick={load}>다시 시도</button></div> : entries.length === 0 ? <p className="empty-text">등록된 {title}이 없습니다.</p> : entries.map(n => <button type="button" key={n.id} className="interactive-notice-row" onClick={() => setSelectedNotice(n)}>{n.isPinned && <span className="category-tag pinned">중요</span>}<span className="row-title">{n.title}</span><time className="row-date">{n.date}</time></button>)}
+        {status === 'loading' ? <p className="empty-text">소식을 불러오고 있습니다…</p> : status === 'error' ? <div className="empty-text"><p>소식을 불러오지 못했습니다.</p><button type="button" className="tab-btn" onClick={load}>다시 시도</button></div> : entries.length === 0 ? <p className="empty-text">등록된 {title}이 없습니다.</p> : entries.map(n => <button type="button" key={n.id} className="interactive-notice-row" onClick={() => { void detail.open(n.id); }}>{n.isPinned && <span className="category-tag pinned">중요</span>}<span className="row-title">{n.title}</span><time className="row-date">{n.date}</time></button>)}
       </div>
     </section>;
   };
@@ -96,6 +99,6 @@ export default function HomePage() {
         </div>
       </section>
     </main>
-    <NoticeDetailModal notice={selectedNotice} isOpen={!!selectedNotice} onClose={() => setSelectedNotice(null)} />
+    <NoticeDetailModal notice={detail.notice} isOpen={detail.isOpen} loading={detail.loading} error={detail.error} onClose={detail.close} />
   </div>;
 }
